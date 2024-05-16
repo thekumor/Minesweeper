@@ -3,19 +3,19 @@
 namespace mines
 {
     
-    Timer::Timer(std::uint32_t repetitions, std::function<void(HWND, UINT, UINT_PTR, DWORD)> callback)
+    Timer::Timer(std::uint32_t repetitions, void (*callback)(HWND, UINT, UINT_PTR, DWORD))
         : m_Id(++s_LastTimerId), m_Repetitions(repetitions), m_Callback(callback)
     {
         Apply();
     }
 
-	Timer::Timer(std::uint32_t repetitions, std::uint32_t elapse, std::function<void(HWND, UINT, UINT_PTR, DWORD)> callback)
+	Timer::Timer(std::uint32_t repetitions, std::uint32_t elapse, void (*callback)(HWND, UINT, UINT_PTR, DWORD))
         : m_Id(++s_LastTimerId), m_Repetitions(repetitions), m_Elapse(elapse), m_Callback(callback)
 	{
         Apply();
     }
 
-    Timer::Timer(Window* owner, std::uint32_t repetitions, std::uint32_t elapse, std::function<void(HWND, UINT, UINT_PTR, DWORD)> callback)
+    Timer::Timer(Window* owner, std::uint32_t repetitions, std::uint32_t elapse, void (*callback)(HWND, UINT, UINT_PTR, DWORD))
         : m_Owner(owner), m_Id(++s_LastTimerId), m_Repetitions(repetitions), m_Elapse(elapse), m_Callback(callback)
     {
         Apply();
@@ -42,7 +42,7 @@ namespace mines
             m_Owner ? m_Owner->m_Handle : nullptr,
             m_Id,
             m_Elapse,
-            s_TimerProc
+            m_Callback
         );
         CheckErrors("SetTimer");
 	}

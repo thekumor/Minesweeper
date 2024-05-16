@@ -31,9 +31,9 @@ namespace mines
 	class Timer : public BaseClass
 	{
 	public:
-		Timer(std::uint32_t repetitions, std::function<void(HWND, UINT, UINT_PTR, DWORD)>);
-		Timer(std::uint32_t repetitions, std::uint32_t elapse, std::function<void(HWND, UINT, UINT_PTR, DWORD)> callback);
-		Timer(Window* owner, std::uint32_t repetitions, std::uint32_t elapse, std::function<void(HWND, UINT, UINT_PTR, DWORD)> callback);
+		Timer(std::uint32_t repetitions, void (*callback)(HWND, UINT, UINT_PTR, DWORD));
+		Timer(std::uint32_t repetitions, std::uint32_t elapse, void (*callback)(HWND, UINT, UINT_PTR, DWORD));
+		Timer(Window* owner, std::uint32_t repetitions, std::uint32_t elapse, void (*callback)(HWND, UINT, UINT_PTR, DWORD));
 		Timer() = default;
 
 		static void CALLBACK s_TimerProc(HWND, UINT, UINT_PTR, DWORD);
@@ -46,7 +46,7 @@ namespace mines
 		Window* m_Owner = nullptr;
 		std::uint64_t m_Id = 0;
 		std::uint32_t m_Repetitions = 1, m_Elapse = 1000;
-		std::function<void(HWND, UINT, UINT_PTR, DWORD)> m_Callback = nullptr;
+		void (*m_Callback)(HWND, UINT, UINT_PTR, DWORD) = nullptr;
 	};
 
 }

@@ -11,7 +11,9 @@ namespace mines
     {
         MSG msg = {};
 
-        Timer timer(10, 3000, (TIMERPROC)NULL);
+        Timer timer(10, 3000, [](HWND, UINT, UINT_PTR, DWORD)->void
+        {
+        });
 
         while (GetMessage(&msg, nullptr, 0, 0))
         {
