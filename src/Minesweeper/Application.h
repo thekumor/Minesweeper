@@ -9,6 +9,7 @@
 #include <Minesweeper/Vectors.h>
 #include <Minesweeper/Window.h>
 #include <Minesweeper/Timers.h>
+#include <Minesweeper/Entities.h>
 
 namespace mines
 {

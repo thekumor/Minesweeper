@@ -39,7 +39,7 @@ namespace mines
 	void Timer::Apply() const
 	{
         UINT_PTR timer = SetTimer(
-            m_Owner ? m_Owner->m_Handle : nullptr,
+            (m_Owner ? static_cast<HWND>(*m_Owner) : nullptr),
             m_Id,
             m_Elapse,
             m_Callback

@@ -8,6 +8,8 @@
 #include <unordered_map>
 
 #define MINES_NODATA std::any(std::uint32_t(0))
+#define MINES_PIN_REC(rec) g_EventSource.PinReceiver(&rec)
+#define MINES_PIN_THIS() g_EventSource.PinReceiver(&m_EventReceiver)
 
 namespace mines
 {
@@ -19,6 +21,9 @@ namespace mines
 		Timer, Command, Close
 	};
 
+	//
+	// Contains a single std::any variable.
+	//
 	struct EventData
 	{
 		EventData(const std::any& val);
@@ -29,6 +34,9 @@ namespace mines
 
 	using EventCallback = std::function<void(const EventData& data)>;
 
+	//
+	// A structure that describes a callback for an event.
+	//
 	struct Hook
 	{
 		Hook(const std::string& name, const EventCallback& callback);
@@ -38,6 +46,9 @@ namespace mines
 		EventCallback Callback = nullptr;
 	};
 
+	//
+	// Contains hooks that are run once event is fired.
+	//
 	struct Event
 	{
 		Event(EventType type);
@@ -47,12 +58,18 @@ namespace mines
 		std::vector<Hook> Hooks = {};
 	};
 
+	//
+	// Base class for event-related classes.
+	//
 	class EventBase
 	{
 	public:
 		EventBase() = default;
 	};
 
+	//
+	// This class runs callbacks when the event source tells it to.
+	//
 	class EventReceiver : public EventBase
 	{
 	public:
@@ -68,6 +85,9 @@ namespace mines
 
 	using FragileEventRecPtr = EventReceiver*;
 
+	//
+	// Tells all the receivers inside it to run callbacks.
+	//
 	class EventSource : public EventBase
 	{
 	public:
@@ -80,12 +100,18 @@ namespace mines
 		std::vector<FragileEventRecPtr> m_Receivers = {};
 	};
 
+	//
+	// Class for others that need a source-receiver system.
+	//
 	class EventManager : public EventReceiver, public EventSource
 	{
 	public:
 		EventManager() = default;
 	};
 
+	//
+	// Class for others that need a source-receiver system.
+	//
 	class EventActive : public EventBase
 	{
 	public:

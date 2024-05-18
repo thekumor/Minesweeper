@@ -1,2 +1,11 @@
 .vs/
-vs2022-old/
+CMakeFiles/
+Debug/
+Minesweeper.dir/
+x64/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.cmake
+CMakeCache.txt
+*vcxproj.user

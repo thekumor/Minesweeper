@@ -4,10 +4,9 @@ namespace mines
 {
 
 	Window::Window(const Vector2& size, const std::wstring& title)
-		: m_Size(size), m_Title(title)
+		: Entity(title, size, {CW_USEDEFAULT, CW_USEDEFAULT}, nullptr)
 	{
 		HINSTANCE instance = reinterpret_cast<HINSTANCE>(GetModuleHandle(nullptr));
-
 		const std::wstring className = L"Minesweeper Window";
 
 		m_Class.hInstance = instance;
@@ -56,11 +55,6 @@ namespace mines
 				EndPaint(handle, &ps);
 
 				g_EventSource.CallEvent(EventType::PostDraw, MINES_NODATA);
-			} break;
-
-			case WM_TIMER:
-			{
-				PostQuitMessage(2);
 			} break;
 		}
 
