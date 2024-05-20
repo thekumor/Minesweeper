@@ -12,9 +12,9 @@
 namespace mines
 {
 
-	//
+	//----------------------------------------------------------
 	// Stuff that is passed to callback.
-	//
+	//----------------------------------------------------------
 	struct TimerData
 	{
 		TimerData(const std::any& data);
@@ -25,9 +25,9 @@ namespace mines
 
 	static std::uint32_t s_LastTimerId;
 
-	//
+	//----------------------------------------------------------
 	// Timer that runs a function n times and every x seconds.
-	//
+	//----------------------------------------------------------
 	class Timer : public BaseClass
 	{
 	public:

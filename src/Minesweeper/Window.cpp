@@ -61,18 +61,4 @@ namespace mines
 		return DefWindowProc(handle, msg, wp, lp);
 	}
 
-	std::shared_ptr<Entity> Window::CreateEntity(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
-	{
-		std::shared_ptr<Entity> ent = std::make_shared<Entity>(text, size, position, parent);
-		m_Entities.push_back(ent);
-		return ent;
-	}
-
-	std::shared_ptr<Text> Window::CreateText(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
-	{
-		std::shared_ptr<Text> ent = std::make_shared<Text>(text, size, position, parent);
-		m_Entities.push_back(ent);
-		return ent;
-	}
-
 }

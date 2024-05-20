@@ -70,4 +70,52 @@ namespace mines
 		Show();
 	}
 
+	Button::Button(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
+		: Entity(text, size, position, parent)
+	{
+		m_Handle = CreateWindow(
+			L"Button",
+			text.c_str(),
+			WS_VISIBLE | BS_PUSHBUTTON | (parent ? WS_CHILD : 0),
+			position.x,
+			position.y,
+			size.x,
+			size.y,
+			(parent ? static_cast<HWND>(*parent) : nullptr),
+			nullptr,
+			reinterpret_cast<HINSTANCE>(GetModuleHandle(nullptr)),
+			0
+		);
+		CheckErrors("Button.m_Handle");
+
+		Show();
+	}
+
+	EditBox::EditBox(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
+		: Entity(text, size, position, parent)
+	{
+		m_Handle = CreateWindow(
+			L"Edit",
+			text.c_str(),
+			WS_VISIBLE | WS_TABSTOP | (parent ? WS_CHILD : 0),
+			position.x,
+			position.y,
+			size.x,
+			size.y,
+			(parent ? static_cast<HWND>(*parent) : nullptr),
+			nullptr,
+			reinterpret_cast<HINSTANCE>(GetModuleHandle(nullptr)),
+			0
+		);
+		CheckErrors("EditBox.m_Handle");
+
+		Show();
+	}
+
+	Img::Img(const std::wstring& path, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
+		: Entity(path, size, position, parent)
+	{
+		//Image image(path.c_str());
+	}
+
 }

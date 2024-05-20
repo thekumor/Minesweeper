@@ -14,10 +14,10 @@
 namespace mines
 {
 
-	//
+	//----------------------------------------------------------
 	// Class that acts as an instance of the application.
 	// Contains a window.
-	//
+	//----------------------------------------------------------
 	class Application : public BaseClass
 	{
 	public:

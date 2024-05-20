@@ -3,6 +3,7 @@
 #include <string>
 
 #include <windows.h>
+//#include <gdiplus.h>
 
 #include <Minesweeper/BaseClass.h>
 #include <Minesweeper/Vectors.h>
@@ -14,6 +15,10 @@ namespace mines
 	class Entity;
 	using FragileEntityPtr = Entity*;
 
+	//----------------------------------------------------------
+	// Main class used for controls & things you see on
+	// the screen.
+	//----------------------------------------------------------
 	class Entity : public BaseClass
 	{
 	public:
@@ -38,11 +43,44 @@ namespace mines
 		bool m_IsVisible = true;
 	};
 
+	//----------------------------------------------------------
+	// Used for displaying a string on the screen.
+	//----------------------------------------------------------
 	class Text : public virtual Entity
 	{
 	public:
 		Text(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
 		Text() = default;
+	};
+
+	//----------------------------------------------------------
+	// Used for user input - mouse.
+	//----------------------------------------------------------
+	class Button : public virtual Entity
+	{
+	public:
+		Button(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
+		Button() = default;
+	};
+
+	//----------------------------------------------------------
+	// Used for user input - keyboard.
+	//----------------------------------------------------------
+	class EditBox : public virtual Entity
+	{
+	public:
+		EditBox(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
+		EditBox() = default;
+	};
+
+	//----------------------------------------------------------
+	// Used for displaying and storing an image.
+	//----------------------------------------------------------
+	class Img : public virtual Entity
+	{
+	public:
+		Img(const std::wstring& path, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
+		Img() = default;
 	};
 
 }
