@@ -9,6 +9,10 @@ namespace mines
 
 	int Application::Run()
 	{
+		Window& wnd = m_Window;
+
+		std::shared_ptr<Text> txt = wnd.CreateText(L"Hello!", { 100, 30 }, { 10, 10 }, &wnd);
+
 		MSG msg = {};
 		while (GetMessage(&msg, nullptr, 0, 0))
 		{

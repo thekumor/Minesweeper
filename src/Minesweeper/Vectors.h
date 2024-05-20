@@ -12,10 +12,10 @@ namespace mines
 		Vector2(const Vector2& other);
 		Vector2() = default;
 
-		Vector2 operator+(const Vector2& other);
-		Vector2 operator-(const Vector2& other);
-		Vector2 operator*(const Vector2& other);
-		Vector2 operator/(const Vector2& other);
+		[[nodiscard]] Vector2 operator+(const Vector2& other);
+		[[nodiscard]] Vector2 operator-(const Vector2& other);
+		[[nodiscard]] Vector2 operator*(const Vector2& other);
+		[[nodiscard]] Vector2 operator/(const Vector2& other);
 
 		union
 		{
