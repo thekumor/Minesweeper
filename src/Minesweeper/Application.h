@@ -1,3 +1,11 @@
+//****************************************************************
+// File: Application.h
+// Purpose: Stores mines::Application which is the main
+//			class of this project.
+// 
+// Authors: The Kumor
+//****************************************************************
+
 #pragma once
 
 #include <cstdint>
@@ -32,3 +40,5 @@ namespace mines
 	};
 
 }
+
+// The Kumor

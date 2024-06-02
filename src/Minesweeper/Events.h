@@ -1,3 +1,10 @@
+//****************************************************************
+// File: Events.h
+// Purpose: Stores the entire event system (hooks, callbacks, etc.)
+// 
+// Authors: The Kumor
+//****************************************************************
+
 #pragma once
 
 #include <string>
@@ -126,3 +133,5 @@ namespace mines
 	};
 
 }
+
+// The Kumor

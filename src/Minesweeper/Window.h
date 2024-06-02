@@ -1,3 +1,10 @@
+//****************************************************************
+// File: Window.h
+// Purpose: Defines mines::Window class.
+// 
+// Authors: The Kumor
+//****************************************************************
+
 #pragma once
 
 #include <string>
@@ -42,3 +49,5 @@ namespace mines
 	};
 
 }
+
+// The Kumor

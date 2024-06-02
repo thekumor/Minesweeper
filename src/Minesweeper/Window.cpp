@@ -4,7 +4,7 @@ namespace mines
 {
 
 	Window::Window(const Vector2& size, const std::wstring& title)
-		: Entity(title, size, {CW_USEDEFAULT, CW_USEDEFAULT}, nullptr)
+		: Entity(title, size, { CW_USEDEFAULT, CW_USEDEFAULT }, nullptr)
 	{
 		HINSTANCE instance = reinterpret_cast<HINSTANCE>(GetModuleHandle(nullptr));
 		const std::wstring className = L"Minesweeper Window";

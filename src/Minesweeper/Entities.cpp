@@ -6,7 +6,7 @@ namespace mines
 	Entity::Entity(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
 		: m_Parent(parent), m_Size(size), m_Position(position), m_Text(text)
 	{
-	
+
 	}
 
 	HWND Entity::GetHandle() const
@@ -66,7 +66,7 @@ namespace mines
 			0
 		);
 		CheckErrors("Text.m_Handle");
-		
+
 		Show();
 	}
 
@@ -115,7 +115,20 @@ namespace mines
 	Img::Img(const std::wstring& path, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
 		: Entity(path, size, position, parent)
 	{
-		//Image image(path.c_str());
+		m_HandleBitmap = static_cast<HBITMAP>(LoadImage(nullptr, path.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
+		CheckErrors("LoadImage");
+		
+		if (!m_HandleBitmap)
+			MakeError("Cannot load a bitmap");
+
+		if (!GetObject(reinterpret_cast<HGDIOBJ>(m_HandleBitmap), sizeof(BITMAP), reinterpret_cast<LPVOID>(&m_Bitmap)))
+			MakeError("Cannot retrieve a bitmap");
+
+		HDC winDC; // TODO: CHANGE THIS
+
+		HDC hdc = CreateCompatibleDC(winDC);
+
+		HBITMAP oldBitmap = static_cast<HBITMAP>(SelectObject());
 	}
 
 }

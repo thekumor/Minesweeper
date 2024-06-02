@@ -1,9 +1,18 @@
+//****************************************************************
+// File: Entities.h
+// Purpose: Has classes for controls that are used for
+//			user input/drawing on the screen.
+// 
+// Authors: The Kumor
+//****************************************************************
+
 #pragma once
 
 #include <string>
 
 #include <windows.h>
-//#include <gdiplus.h>
+#include <objidl.h>
+#include <gdiplus.h>
 
 #include <Minesweeper/BaseClass.h>
 #include <Minesweeper/Vectors.h>
@@ -81,6 +90,12 @@ namespace mines
 	public:
 		Img(const std::wstring& path, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
 		Img() = default;
+
+	private:
+		BITMAP m_Bitmap = { 0 };
+		HBITMAP m_HandleBitmap = nullptr;
 	};
 
 }
+
+// The Kumor

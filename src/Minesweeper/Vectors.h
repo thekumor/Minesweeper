@@ -1,3 +1,11 @@
+//****************************************************************
+// File: Vectors.h
+// Purpose: Contains mines::Vector2, which is used for storing
+//			two integers together and allows maths on them.
+//  
+// Authors: The Kumor
+//****************************************************************
+
 #pragma once
 
 #include <cstdint>
@@ -31,3 +39,5 @@ namespace mines
 	};
 
 }
+
+// The Kumor

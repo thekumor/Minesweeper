@@ -1,3 +1,10 @@
+//****************************************************************
+// File: Timers.h
+// Purpose: Has timers that trigger every x seconds.
+// 
+// Authors: The Kumor
+//****************************************************************
+
 #pragma once
 
 #include <cstdint>
@@ -50,3 +57,5 @@ namespace mines
 	};
 
 }
+
+// The Kumor

@@ -1,3 +1,11 @@
+//****************************************************************
+// Project: Minesweeper
+// Purpose: To re-create a famous minesweeper game from Windows XP
+//			which people can play.
+// 
+// Authors: The Kumor
+//****************************************************************
+
 #include <windows.h>
 
 #include <Minesweeper/Global.h>
@@ -22,3 +30,5 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, in
 	Application app(Vector2(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 	return app.Run();
 }
+
+// The Kumor

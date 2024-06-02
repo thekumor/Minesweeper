@@ -23,4 +23,11 @@ namespace mines
         return errorCode;
     }
 
+    void MakeError(const std::string& msg, bool fatal)
+    {
+        MessageBoxA(nullptr, msg.c_str(), "Error", IDOK);
+        if (fatal)
+            PostQuitMessage(1);
+    }
+
 }
