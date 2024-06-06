@@ -34,6 +34,7 @@ namespace mines
 		Window() = default;
 
 		static LRESULT CALLBACK s_Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp);
+		static bool s_DrawBitmap(HDC winDC, const std::wstring& path);
 
 		template <typename T>
 		std::shared_ptr<T> CreateEntity(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)

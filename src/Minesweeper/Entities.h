@@ -83,16 +83,18 @@ namespace mines
 	};
 
 	//----------------------------------------------------------
-	// Used for displaying and storing an image.
+	// An image that can be drawn to the screen.
 	//----------------------------------------------------------
 	class Img : public virtual Entity
 	{
 	public:
-		Img(const std::wstring& path, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
+		Img(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
 		Img() = default;
+		~Img();
+
+		void Draw(HDC windowDC);
 
 	private:
-		BITMAP m_Bitmap = { 0 };
 		HBITMAP m_HandleBitmap = nullptr;
 	};
 

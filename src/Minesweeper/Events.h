@@ -1,6 +1,6 @@
 //****************************************************************
 // File: Events.h
-// Purpose: Stores the entire event system (hooks, callbacks, etc.)
+// Purpose: Stores the entire event system (hooks, callbacks, etc).
 // 
 // Authors: The Kumor
 //****************************************************************

@@ -61,4 +61,36 @@ namespace mines
 		return DefWindowProc(handle, msg, wp, lp);
 	}
 
+	bool Window::s_DrawBitmap(HDC winDC, const std::wstring& path)
+	{
+		HBITMAP handleBitmap = static_cast<HBITMAP>(LoadImage(nullptr, path.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
+		CheckErrors("LoadImage");
+
+		if (!handleBitmap)
+		{
+			MakeError("Cannot load a bitmap");
+			return false;
+		}
+
+		BITMAP qBitmap = { 0 };
+		if (!GetObject(reinterpret_cast<HGDIOBJ>(handleBitmap), sizeof(BITMAP), reinterpret_cast<LPVOID>(&qBitmap)))
+		{
+			MakeError("Cannot make a bitmap");
+			return false;
+		}
+
+		HDC hdc = CreateCompatibleDC(winDC);
+		CheckErrors("CreateCompatibleDC");
+
+		SelectObject(hdc, handleBitmap);
+		BitBlt(winDC, 0, 0, qBitmap.bmWidth, qBitmap.bmHeight, hdc, 0, 0, SRCCOPY);
+		CheckErrors("BitBlt");
+
+		SelectObject(hdc, winDC);
+		DeleteDC(hdc);
+		DeleteObject(handleBitmap);
+
+		return true;
+	}
+
 }

@@ -112,23 +112,39 @@ namespace mines
 		Show();
 	}
 
-	Img::Img(const std::wstring& path, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
-		: Entity(path, size, position, parent)
+	Img::Img(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
 	{
-		m_HandleBitmap = static_cast<HBITMAP>(LoadImage(nullptr, path.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
+		m_HandleBitmap = static_cast<HBITMAP>(LoadImage(nullptr, text.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
 		CheckErrors("LoadImage");
-		
 		if (!m_HandleBitmap)
-			MakeError("Cannot load a bitmap");
+			MakeError("Cannot load a bitmap", false);
+	}
 
-		if (!GetObject(reinterpret_cast<HGDIOBJ>(m_HandleBitmap), sizeof(BITMAP), reinterpret_cast<LPVOID>(&m_Bitmap)))
-			MakeError("Cannot retrieve a bitmap");
+	Img::~Img()
+	{
+		DeleteObject(reinterpret_cast<HGDIOBJ>(m_HandleBitmap));
+	}
 
-		HDC winDC; // TODO: CHANGE THIS
+	void Img::Draw(HDC windowDC)
+	{
+		BITMAP bitmap = { 0 };
+		if (!GetObject(reinterpret_cast<HGDIOBJ>(m_HandleBitmap), sizeof(BITMAP), reinterpret_cast<LPVOID>(&bitmap)))
+		{
+			MakeError("Cannot make a bitmap");
+			return;
+		}
 
-		HDC hdc = CreateCompatibleDC(winDC);
+		HDC hdc = CreateCompatibleDC(windowDC);
+		CheckErrors("CreateCompatibleDC");
+		if (!hdc)
+			return;
 
-		HBITMAP oldBitmap = static_cast<HBITMAP>(SelectObject());
+		SelectObject(hdc, m_HandleBitmap);
+		BitBlt(windowDC, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdc, 0, 0, SRCCOPY);
+		CheckErrors("BitBlt");
+		
+		SelectObject(hdc, windowDC);
+		DeleteDC(hdc);
 	}
 
 }
