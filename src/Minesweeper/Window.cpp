@@ -93,4 +93,14 @@ namespace mines
 		return true;
 	}
 
+	std::shared_ptr<Scene> Window::CreateScene(const std::string& name)
+	{
+		return m_Scenes.emplace_back(std::make_shared<Scene>(name));
+	}
+
+	Scene::Scene(const std::string& name)
+		: m_Name(name)
+	{
+	}
+
 }

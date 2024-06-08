@@ -113,6 +113,7 @@ namespace mines
 	}
 
 	Img::Img(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
+		: Entity(text, size, position, parent)
 	{
 		m_HandleBitmap = static_cast<HBITMAP>(LoadImage(nullptr, text.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
 		CheckErrors("LoadImage");
@@ -122,7 +123,8 @@ namespace mines
 
 	Img::~Img()
 	{
-		DeleteObject(reinterpret_cast<HGDIOBJ>(m_HandleBitmap));
+		if (m_HandleBitmap)
+			DeleteObject(reinterpret_cast<HGDIOBJ>(m_HandleBitmap));
 	}
 
 	void Img::Draw(HDC windowDC)
@@ -140,7 +142,7 @@ namespace mines
 			return;
 
 		SelectObject(hdc, m_HandleBitmap);
-		BitBlt(windowDC, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdc, 0, 0, SRCCOPY);
+		BitBlt(windowDC, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdc, m_Position.x, m_Position.y, SRCCOPY);
 		CheckErrors("BitBlt");
 		
 		SelectObject(hdc, windowDC);

@@ -11,7 +11,8 @@ namespace mines
 	{
 		Window& wnd = m_Window;
 
-		std::shared_ptr<EditBox> txt = wnd.CreateEntity<EditBox>(L"Hello!", { 100, 30 }, { 10, 10 }, &wnd);
+		std::shared_ptr<Scene> mainScene = wnd.CreateScene("Main");
+		std::shared_ptr<EditBox> txt = mainScene->CreateEntity<EditBox>(L"Hello!", { 100, 30 }, { 10, 10 }, &wnd);
 
 		MSG msg = {};
 		while (GetMessage(&msg, nullptr, 0, 0))

@@ -1,6 +1,6 @@
 //****************************************************************
 // File: Window.h
-// Purpose: Defines mines::Window class.
+// Purpose: Contains window and scene classes.
 // 
 // Authors: The Kumor
 //****************************************************************
@@ -25,16 +25,13 @@ namespace mines
 {
 
 	//----------------------------------------------------------
-	// A window that can have items such as controls in it.
+	// A container for entities.
 	//----------------------------------------------------------
-	class Window : public virtual Entity
+	class Scene : public BaseClass
 	{
 	public:
-		Window(const Vector2& size, const std::wstring& title);
-		Window() = default;
-
-		static LRESULT CALLBACK s_Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp);
-		static bool s_DrawBitmap(HDC winDC, const std::wstring& path);
+		Scene(const std::string& name = "");
+		Scene() = default;
 
 		template <typename T>
 		std::shared_ptr<T> CreateEntity(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
@@ -45,8 +42,27 @@ namespace mines
 		}
 
 	private:
-		WNDCLASS m_Class = { 0 };
+		std::string m_Name = "";
 		std::vector<std::shared_ptr<Entity>> m_Entities = {};
+	};
+
+	//----------------------------------------------------------
+	// A window that can contains scenes that can be swapped.
+	//----------------------------------------------------------
+	class Window : public virtual Entity
+	{
+	public:
+		Window(const Vector2& size, const std::wstring& title);
+		Window() = default;
+
+		static LRESULT CALLBACK s_Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp);
+		static bool s_DrawBitmap(HDC winDC, const std::wstring& path);
+
+		std::shared_ptr<Scene> CreateScene(const std::string& name = "");
+
+	private:
+		WNDCLASS m_Class = { 0 };
+		std::vector<std::shared_ptr<Scene>> m_Scenes = {};
 	};
 
 }
