@@ -11,6 +11,7 @@
 #include <any>
 #include <vector>
 #include <memory>
+#include <optional>
 
 #include <windows.h>
 
@@ -40,8 +41,14 @@ namespace mines
 			m_Entities.push_back(ent);
 			return ent;
 		}
+		
+		const std::string& GetName() const;
+
+		void Clear();
+		void Switch(bool on);
 
 	private:
+		bool m_Switched = true;
 		std::string m_Name = "";
 		std::vector<std::shared_ptr<Entity>> m_Entities = {};
 	};
@@ -57,6 +64,8 @@ namespace mines
 
 		static LRESULT CALLBACK s_Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp);
 		static bool s_DrawBitmap(HDC winDC, const std::wstring& path);
+
+		std::optional<std::shared_ptr<Scene>> GetSceneByName(const std::string& name = "");
 
 		std::shared_ptr<Scene> CreateScene(const std::string& name = "");
 

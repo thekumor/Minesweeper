@@ -41,6 +41,7 @@ namespace mines
 		void SetText(const std::wstring& text);
 		void Show();
 		void Hide();
+		void Close();
 
 		operator HWND();
 

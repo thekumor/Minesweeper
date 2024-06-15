@@ -93,6 +93,15 @@ namespace mines
 		return true;
 	}
 
+	std::optional<std::shared_ptr<Scene>> Window::GetSceneByName(const std::string& name)
+	{
+		for (auto& ptr : m_Scenes)
+			if (ptr->GetName() == name)
+				return ptr;
+
+		return {};
+	}
+
 	std::shared_ptr<Scene> Window::CreateScene(const std::string& name)
 	{
 		return m_Scenes.emplace_back(std::make_shared<Scene>(name));
@@ -101,6 +110,29 @@ namespace mines
 	Scene::Scene(const std::string& name)
 		: m_Name(name)
 	{
+	}
+
+	const std::string& Scene::GetName() const
+	{
+		return m_Name;
+	}
+
+	void Scene::Clear()
+	{
+		for (auto& k : m_Entities)
+			k->Close();
+	}
+
+	void Scene::Switch(bool on)
+	{
+		m_Switched = on;
+
+		if (m_Switched)
+			for (auto& k : m_Entities)
+				k->Show();
+		else
+			for (auto& k : m_Entities)
+				k->Hide();
 	}
 
 }

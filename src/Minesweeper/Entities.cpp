@@ -44,6 +44,11 @@ namespace mines
 		ShowWindow(m_Handle, SW_HIDE);
 	}
 
+	void Entity::Close()
+	{
+		CloseWindow(m_Handle);
+	}
+
 	Entity::operator HWND()
 	{
 		return GetHandle();
