@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <string>
+#include <algorithm>
 
 #include <windows.h>
 
@@ -32,11 +33,80 @@ namespace mines
 		Application(const Vector2& windowSize, const std::wstring& windowTitle);
 		Application() = default;
 
+		// Runs the application and puts it into it's main loop.
 		int Run();
 
 	private:
 		// Main application's window.
 		Window m_Window;
+	};
+
+	//----------------------------------------------------------
+	// Player's entry to the leader board. Has his name and score.
+	//----------------------------------------------------------
+	class LeaderboardEntry : public BaseClass
+	{
+	public:
+		LeaderboardEntry(const std::wstring& playerName, std::int32_t score);
+		LeaderboardEntry() = default;
+
+		bool operator==(const LeaderboardEntry& other)
+		{
+			return m_PlayerName == other.m_PlayerName && m_Score == other.m_Score;
+		}
+		bool operator>(const LeaderboardEntry& other)
+		{
+			return m_Score > other.m_Score;
+		}
+		bool operator<(const LeaderboardEntry& other)
+		{
+			return m_Score < other.m_Score;
+		}
+		bool operator>=(const LeaderboardEntry& other)
+		{
+			return m_Score >= other.m_Score;
+		}
+		bool operator<=(const LeaderboardEntry& other)
+		{
+			return m_Score <= other.m_Score;
+		}
+
+	private:
+		// The name that user provided.
+		std::wstring m_PlayerName = L"";
+
+		// The score points that user has/had.
+		std::int32_t m_Score = -1;
+	};
+
+	//----------------------------------------------------------
+	// Leader board that sorts players and has capability
+	// of displaying itself.
+	//----------------------------------------------------------
+	class Leaderboard : public BaseClass
+	{
+	public:
+		Leaderboard() = default;
+
+		// Adds a player into the leader board.
+		void AddEntry(const LeaderboardEntry& entry);
+
+		// Removes a particular player from the leader board.
+		void RemoveEntry(const LeaderboardEntry& entry);
+
+		// Removes a particular index from the leader board.
+		void RemoveEntry(std::int32_t index);
+
+		// Draws the leader board onto the screen.
+		// TODO: how do we even draw it here?
+		void Draw();
+
+	private:
+		// Re-arranges players so it looks like an actual leader board.
+		void Sort();
+
+		// Players stored here.
+		std::vector<LeaderboardEntry> m_Entries = {};
 	};
 
 }

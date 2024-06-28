@@ -24,4 +24,39 @@ namespace mines
 		return EXIT_SUCCESS;
 	}
 
+	LeaderboardEntry::LeaderboardEntry(const std::wstring& playerName, std::int32_t score)
+		: m_PlayerName(playerName), m_Score(score)
+	{
+	}
+
+	void Leaderboard::AddEntry(const LeaderboardEntry& entry)
+	{
+		m_Entries.emplace_back(entry);
+		Sort();
+	}
+
+	void Leaderboard::RemoveEntry(const LeaderboardEntry& entry)
+	{
+		// 'erase-remove' idiom
+		auto newEnd = std::remove(m_Entries.begin(), m_Entries.end(), entry);
+		m_Entries.erase(newEnd, m_Entries.end());
+
+		Sort();
+	}
+
+	void Leaderboard::RemoveEntry(std::int32_t index)
+	{
+		m_Entries.erase(m_Entries.begin() + index);
+		Sort();
+	}
+
+	void Leaderboard::Draw()
+	{
+	}
+
+	void Leaderboard::Sort()
+	{
+		std::sort(m_Entries.begin(), m_Entries.end());
+	}
+
 }

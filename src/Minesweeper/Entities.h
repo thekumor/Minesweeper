@@ -93,6 +93,7 @@ namespace mines
 		Img() = default;
 		~Img();
 
+		// Draws the image into a particular HDC (window, control, etc.)
 		void Draw(HDC windowDC);
 
 	private:
