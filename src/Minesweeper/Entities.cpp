@@ -3,7 +3,7 @@
 namespace mines
 {
 
-	Entity::Entity(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
+	Entity::Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
 		: m_Parent(parent), m_Size(size), m_Position(position), m_Text(text)
 	{
 
@@ -14,13 +14,13 @@ namespace mines
 		return m_Handle;
 	}
 
-	void Entity::SetPosition(const Vector2& position)
+	void Entity::SetPosition(const Vector2<>& position)
 	{
 		m_Position = position;
 		SetWindowPos(m_Handle, nullptr, position.x, position.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	}
 
-	void Entity::SetSize(const Vector2& size)
+	void Entity::SetSize(const Vector2<>& size)
 	{
 		m_Size = size;
 		SetWindowPos(m_Handle, nullptr, 0, 0, size.x, size.y, SWP_NOREPOSITION | SWP_NOZORDER);
@@ -54,7 +54,7 @@ namespace mines
 		return GetHandle();
 	}
 
-	Text::Text(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
+	Text::Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
 		: Entity(text, size, position, parent)
 	{
 		m_Handle = CreateWindow(
@@ -75,7 +75,7 @@ namespace mines
 		Show();
 	}
 
-	Button::Button(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
+	Button::Button(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
 		: Entity(text, size, position, parent)
 	{
 		m_Handle = CreateWindow(
@@ -96,7 +96,7 @@ namespace mines
 		Show();
 	}
 
-	EditBox::EditBox(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
+	EditBox::EditBox(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
 		: Entity(text, size, position, parent)
 	{
 		m_Handle = CreateWindow(
@@ -117,7 +117,7 @@ namespace mines
 		Show();
 	}
 
-	Img::Img(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
+	Img::Img(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
 		: Entity(text, size, position, parent)
 	{
 		m_HandleBitmap = static_cast<HBITMAP>(LoadImage(nullptr, text.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));

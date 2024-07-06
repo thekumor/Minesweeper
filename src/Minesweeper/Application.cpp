@@ -2,7 +2,7 @@
 
 namespace mines
 {
-	Application::Application(const Vector2& windowSize, const std::wstring& windowTitle)
+	Application::Application(const Vector2<>& windowSize, const std::wstring& windowTitle)
 		: m_Window(windowSize, windowTitle)
 	{
 	}

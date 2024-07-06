@@ -25,7 +25,7 @@ namespace mines
 	{
 		Invalid = 0,
 		Tick, Update, PreDraw, PostDraw,
-		Timer, Command, Close
+		Timer, Command, Close, Resize
 	};
 
 	//----------------------------------------------------------

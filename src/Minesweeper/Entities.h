@@ -31,13 +31,13 @@ namespace mines
 	class Entity : public BaseClass
 	{
 	public:
-		Entity(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
+		Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent);
 		Entity() = default;
 		virtual ~Entity() = default;
 
 		HWND GetHandle() const;
-		void SetPosition(const Vector2& position);
-		void SetSize(const Vector2& size);
+		void SetPosition(const Vector2<>& position);
+		void SetSize(const Vector2<>& size);
 		void SetText(const std::wstring& text);
 		void Show();
 		void Hide();
@@ -48,7 +48,7 @@ namespace mines
 	protected:
 		FragileEntityPtr m_Parent = nullptr;
 		HWND m_Handle = nullptr;
-		Vector2 m_Size = 0, m_Position = 0;
+		Vector2<> m_Size = 0, m_Position = 0;
 		std::wstring m_Tag = L"", m_Text = L"";
 		bool m_IsVisible = true;
 	};
@@ -59,7 +59,7 @@ namespace mines
 	class Text : public virtual Entity
 	{
 	public:
-		Text(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
+		Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent);
 		Text() = default;
 	};
 
@@ -69,7 +69,7 @@ namespace mines
 	class Button : public virtual Entity
 	{
 	public:
-		Button(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
+		Button(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent);
 		Button() = default;
 	};
 
@@ -79,7 +79,7 @@ namespace mines
 	class EditBox : public virtual Entity
 	{
 	public:
-		EditBox(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
+		EditBox(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent);
 		EditBox() = default;
 	};
 
@@ -89,7 +89,7 @@ namespace mines
 	class Img : public virtual Entity
 	{
 	public:
-		Img(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent);
+		Img(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent);
 		Img() = default;
 		~Img();
 

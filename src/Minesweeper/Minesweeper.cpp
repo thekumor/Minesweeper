@@ -27,7 +27,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, in
 	//mines::CheckErrors("AllocConsole");
 #endif
 	
-	Application app(Vector2(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
+	Application app(Vector2<>(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 	return app.Run();
 }
 

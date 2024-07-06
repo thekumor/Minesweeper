@@ -3,7 +3,7 @@
 namespace mines
 {
 
-	Window::Window(const Vector2& size, const std::wstring& title)
+	Window::Window(const Vector2<>& size, const std::wstring& title)
 		: Entity(title, size, { CW_USEDEFAULT, CW_USEDEFAULT }, nullptr)
 	{
 		HINSTANCE instance = reinterpret_cast<HINSTANCE>(GetModuleHandle(nullptr));
@@ -55,6 +55,16 @@ namespace mines
 				EndPaint(handle, &ps);
 
 				g_EventSource.CallEvent(EventType::PostDraw, MINES_NODATA);
+			} break;
+
+			case WM_SIZE:
+			{
+				UINT width = LOWORD(lp);
+				UINT height = HIWORD(lp);
+				g_EventSource.CallEvent(EventType::Resize, Vector2<>(
+					static_cast<std::int32_t>(width),
+					static_cast<std::int32_t>(height)
+				));
 			} break;
 		}
 

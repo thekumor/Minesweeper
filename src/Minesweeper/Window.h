@@ -35,7 +35,7 @@ namespace mines
 		Scene() = default;
 
 		template <typename T>
-		std::shared_ptr<T> CreateEntity(const std::wstring& text, const Vector2& size, const Vector2& position, FragileEntityPtr parent)
+		std::shared_ptr<T> CreateEntity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
 		{
 			std::shared_ptr<T> ent = std::make_shared<T>(text, size, position, parent);
 			m_Entities.push_back(ent);
@@ -59,7 +59,7 @@ namespace mines
 	class Window : public virtual Entity
 	{
 	public:
-		Window(const Vector2& size, const std::wstring& title);
+		Window(const Vector2<>& size, const std::wstring& title);
 		Window() = default;
 
 		static LRESULT CALLBACK s_Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp);

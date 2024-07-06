@@ -30,7 +30,7 @@ namespace mines
 	class Application : public BaseClass
 	{
 	public:
-		Application(const Vector2& windowSize, const std::wstring& windowTitle);
+		Application(const Vector2<>& windowSize, const std::wstring& windowTitle);
 		Application() = default;
 
 		// Runs the application and puts it into it's main loop.
@@ -88,13 +88,13 @@ namespace mines
 	public:
 		Leaderboard() = default;
 
-		// Adds a player into the leader board.
+		// Adds a player into the leader board, then sorts itself.
 		void AddEntry(const LeaderboardEntry& entry);
 
-		// Removes a particular player from the leader board.
+		// Removes a particular player from the leader board, then sorts itself.
 		void RemoveEntry(const LeaderboardEntry& entry);
 
-		// Removes a particular index from the leader board.
+		// Removes a particular index from the leader board, then sorts itself.
 		void RemoveEntry(std::int32_t index);
 
 		// Draws the leader board onto the screen.
