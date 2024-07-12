@@ -30,6 +30,12 @@ namespace mines
 		{
 		}
 
+		template <typename Y>
+		Vector2<T>(const Vector2<Y>& other)
+			: X(x), Y(y)
+		{
+		}
+
 		Vector2(const Vector2& other)
 			: X(other.x), Y(other.y)
 		{
@@ -45,14 +51,16 @@ namespace mines
 			return Vector2(x - other.x, y - other.y);
 		}
 
-		[[nodiscard]] Vector2 operator*(const Vector2& other) const
+		template <typename Y>
+		[[nodiscard]] Vector2<T> operator*(const Vector2<Y>& other) const
 		{
-			return Vector2(x * other.x, y * other.y);
+			return Vector2<T>(x * other.x, y * other.y);
 		}
 
-		[[nodiscard]] Vector2<> operator/(const Vector2& other) const
+		template <typename Y>
+		[[nodiscard]] Vector2<T> operator/(const Vector2<Y>& other) const
 		{
-			return Vector2(x / other.x, y / other.y);
+			return Vector2<T>(x / other.x, y / other.y);
 		}
 
 		union

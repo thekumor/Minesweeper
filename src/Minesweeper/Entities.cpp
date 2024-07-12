@@ -6,7 +6,22 @@ namespace mines
 	Entity::Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
 		: m_Parent(parent), m_Size(size), m_Position(position), m_Text(text)
 	{
+		m_EventReceiver.AddHook(EventType::Resize, Hook(
+			"Entity.Resize",
+			[this](const EventData& data)
+		{
+			Vector2<UINT> oldWindowSize = 1;
+			Vector2<UINT> newWindowSize = std::any_cast<Vector2<UINT>>(data);
 
+			Vector2<float> fraction(
+				static_cast<float>(newWindowSize.x) / oldWindowSize.x,
+				static_cast<float>(newWindowSize.y) / oldWindowSize.y
+			);
+
+			const Vector2<float> newSize = m_Size * fraction;
+			this->SetSize(newSize);
+		}
+		));
 	}
 
 	HWND Entity::GetHandle() const
@@ -149,7 +164,7 @@ namespace mines
 		SelectObject(hdc, m_HandleBitmap);
 		BitBlt(windowDC, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdc, m_Position.x, m_Position.y, SRCCOPY);
 		CheckErrors("BitBlt");
-		
+
 		SelectObject(hdc, windowDC);
 		DeleteDC(hdc);
 	}

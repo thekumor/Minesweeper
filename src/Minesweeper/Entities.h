@@ -17,6 +17,7 @@
 #include <Minesweeper/BaseClass.h>
 #include <Minesweeper/Vectors.h>
 #include <Minesweeper/Errors.h>
+#include <Minesweeper/Events.h>
 
 namespace mines
 {

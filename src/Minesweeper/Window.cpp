@@ -59,12 +59,9 @@ namespace mines
 
 			case WM_SIZE:
 			{
-				UINT width = LOWORD(lp);
-				UINT height = HIWORD(lp);
-				g_EventSource.CallEvent(EventType::Resize, Vector2<>(
-					static_cast<std::int32_t>(width),
-					static_cast<std::int32_t>(height)
-				));
+				UINT width = static_cast<UINT>(LOWORD(lp));
+				UINT height = static_cast<UINT>(HIWORD(lp));
+				g_EventSource.CallEvent(EventType::Resize, Vector2<UINT>(width, height));
 			} break;
 		}
 

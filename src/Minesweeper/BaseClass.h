@@ -9,6 +9,11 @@
 
 #include <Minesweeper/Events.h>
 
+#define MINES_CLASSES_EVENTACTIVE 1
+#ifdef MINES_CLASSES_EVENTACTIVE
+#include <Minesweeper/Global.h>
+#endif
+
 namespace mines
 {
 
@@ -18,7 +23,7 @@ namespace mines
 	class BaseClass : public EventActive
 	{
 	public:
-		BaseClass() = default;
+		BaseClass();
 	};
 
 }
