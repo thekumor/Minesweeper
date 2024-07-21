@@ -14,16 +14,25 @@
 #include <objidl.h>
 #include <gdiplus.h>
 
+#include <Minesweeper/Global.h>
 #include <Minesweeper/BaseClass.h>
 #include <Minesweeper/Vectors.h>
 #include <Minesweeper/Errors.h>
 #include <Minesweeper/Events.h>
+
+#define HAS_FLAG(var,val) ((std::int32_t(var) & std::int32_t(val)) != 0)
 
 namespace mines
 {
 
 	class Entity;
 	using FragileEntityPtr = Entity*;
+
+	enum class EntityFlags : std::uint8_t
+	{
+		None = 0,
+		IgnoreResize
+	};
 
 	//----------------------------------------------------------
 	// Main class used for controls & things you see on
@@ -32,14 +41,18 @@ namespace mines
 	class Entity : public BaseClass
 	{
 	public:
-		Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent);
+		Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent,
+			EntityFlags flags = EntityFlags::None);
 		Entity() = default;
 		virtual ~Entity() = default;
 
 		HWND GetHandle() const;
+
 		void SetPosition(const Vector2<>& position);
 		void SetSize(const Vector2<>& size);
+		void Resize(const Vector2<>& size);
 		void SetText(const std::wstring& text);
+		void SetFlags(EntityFlags flags);
 		void Show();
 		void Hide();
 		void Close();
@@ -49,8 +62,9 @@ namespace mines
 	protected:
 		FragileEntityPtr m_Parent = nullptr;
 		HWND m_Handle = nullptr;
-		Vector2<> m_Size = 0, m_Position = 0;
+		Vector2<> m_Size = 0, m_OriginalSize = 0, m_Position = 0;
 		std::wstring m_Tag = L"", m_Text = L"";
+		EntityFlags m_Flags = EntityFlags::None;
 		bool m_IsVisible = true;
 	};
 

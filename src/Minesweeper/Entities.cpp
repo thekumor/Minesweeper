@@ -3,25 +3,30 @@
 namespace mines
 {
 
-	Entity::Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
-		: m_Parent(parent), m_Size(size), m_Position(position), m_Text(text)
+	Entity::Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent,
+		EntityFlags flags)
+		: m_Parent(parent), m_Size(size), m_OriginalSize(size), m_Position(position), m_Text(text), m_Flags(flags)
 	{
 		m_EventReceiver.AddHook(EventType::Resize, Hook(
 			"Entity.Resize",
 			[this](const EventData& data)
 		{
-			Vector2<UINT> oldWindowSize = 1;
-			Vector2<UINT> newWindowSize = std::any_cast<Vector2<UINT>>(data);
+			if (!HAS_FLAG(m_Flags, EntityFlags::IgnoreResize))
+			{
+				Vector2<WORD> oldWindowSize = { WINDOW_WIDTH, WINDOW_HEIGHT };
+				Vector2<WORD> newWindowSize = std::any_cast<Vector2<WORD>>(data.Value);
 
-			Vector2<float> fraction(
-				static_cast<float>(newWindowSize.x) / oldWindowSize.x,
-				static_cast<float>(newWindowSize.y) / oldWindowSize.y
-			);
+				Vector2<float> fraction(
+					static_cast<float>(newWindowSize.x) / oldWindowSize.x,
+					static_cast<float>(newWindowSize.y) / oldWindowSize.y
+				);
 
-			const Vector2<float> newSize = m_Size * fraction;
-			this->SetSize(newSize);
+				const Vector2<> newSize = m_Size * fraction;
+				this->Resize(newSize);
+			}
 		}
 		));
+		MINES_PIN_THIS();
 	}
 
 	HWND Entity::GetHandle() const
@@ -38,7 +43,13 @@ namespace mines
 	void Entity::SetSize(const Vector2<>& size)
 	{
 		m_Size = size;
-		SetWindowPos(m_Handle, nullptr, 0, 0, size.x, size.y, SWP_NOREPOSITION | SWP_NOZORDER);
+		m_OriginalSize = size;
+		SetWindowPos(m_Handle, nullptr, 0, 0, size.x, size.y, SWP_NOMOVE | SWP_NOZORDER);
+	}
+
+	void Entity::Resize(const Vector2<>& size)
+	{
+		SetWindowPos(m_Handle, nullptr, 0, 0, size.x, size.y, SWP_NOMOVE | SWP_NOZORDER);
 	}
 
 	void Entity::SetText(const std::wstring& text)
@@ -57,6 +68,11 @@ namespace mines
 	{
 		m_IsVisible = false;
 		ShowWindow(m_Handle, SW_HIDE);
+	}
+
+	void Entity::SetFlags(EntityFlags flags)
+	{
+		m_Flags = flags;
 	}
 
 	void Entity::Close()

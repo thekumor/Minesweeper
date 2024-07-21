@@ -9,6 +9,10 @@
 
 #include <Minesweeper/Events.h>
 
+#define WINDOW_WIDTH 1440
+#define WINDOW_HEIGHT 900
+#define WINDOW_TITLE L"Minesweeper"
+
 namespace mines
 {
 

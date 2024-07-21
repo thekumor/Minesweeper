@@ -4,7 +4,7 @@ namespace mines
 {
 
 	Window::Window(const Vector2<>& size, const std::wstring& title)
-		: Entity(title, size, { CW_USEDEFAULT, CW_USEDEFAULT }, nullptr)
+		: Entity(title, size, { CW_USEDEFAULT, CW_USEDEFAULT }, nullptr, EntityFlags::IgnoreResize)
 	{
 		HINSTANCE instance = reinterpret_cast<HINSTANCE>(GetModuleHandle(nullptr));
 		const std::wstring className = L"Minesweeper Window";
@@ -59,9 +59,9 @@ namespace mines
 
 			case WM_SIZE:
 			{
-				UINT width = static_cast<UINT>(LOWORD(lp));
-				UINT height = static_cast<UINT>(HIWORD(lp));
-				g_EventSource.CallEvent(EventType::Resize, Vector2<UINT>(width, height));
+				WORD width = LOWORD(lp);
+				WORD height = HIWORD(lp);
+				g_EventSource.CallEvent(EventType::Resize, Vector2<WORD>(width, height));
 			} break;
 		}
 

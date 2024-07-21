@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <unordered_map>
 
-#define MINES_NODATA std::any(std::uint32_t(0))
+#define MINES_NODATA nullptr
 #define MINES_PIN_REC(rec) g_EventSource.PinReceiver(&rec)
 #define MINES_PIN_THIS() g_EventSource.PinReceiver(&m_EventReceiver)
 
