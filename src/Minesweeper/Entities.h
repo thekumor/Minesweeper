@@ -51,6 +51,7 @@ namespace mines
 		void SetPosition(const Vector2<>& position);
 		void SetSize(const Vector2<>& size);
 		void Resize(const Vector2<>& size);
+		void Reposition(const Vector2<>& position);
 		void SetText(const std::wstring& text);
 		void SetFlags(EntityFlags flags);
 		void Show();
@@ -62,7 +63,7 @@ namespace mines
 	protected:
 		FragileEntityPtr m_Parent = nullptr;
 		HWND m_Handle = nullptr;
-		Vector2<> m_Size = 0, m_OriginalSize = 0, m_Position = 0;
+		Vector2<> m_Size = 0, m_OriginalSize = 0, m_Position = 0, m_OriginalPosition = 0;
 		std::wstring m_Tag = L"", m_Text = L"";
 		EntityFlags m_Flags = EntityFlags::None;
 		bool m_IsVisible = true;

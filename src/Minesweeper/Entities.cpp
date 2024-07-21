@@ -22,7 +22,9 @@ namespace mines
 				);
 
 				const Vector2<> newSize = m_Size * fraction;
+				const Vector2<> newPosition = m_Position * fraction;
 				this->Resize(newSize);
+				this->Reposition(newPosition);
 			}
 		}
 		));
@@ -37,6 +39,7 @@ namespace mines
 	void Entity::SetPosition(const Vector2<>& position)
 	{
 		m_Position = position;
+		m_OriginalPosition = position;
 		SetWindowPos(m_Handle, nullptr, position.x, position.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	}
 
@@ -83,6 +86,11 @@ namespace mines
 	Entity::operator HWND()
 	{
 		return GetHandle();
+	}
+
+	void Entity::Reposition(const Vector2<>& position)
+	{
+		SetWindowPos(m_Handle, nullptr, position.x, position.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	}
 
 	Text::Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
