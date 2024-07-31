@@ -11,10 +11,24 @@ namespace mines
 	{
 		Window& wnd = m_Window;
 
-		std::shared_ptr<Scene> mainScene = wnd.CreateScene("Main");
-		
+		std::shared_ptr<Scene> minefieldScene = wnd.CreateScene("Mine field");
+		std::shared_ptr<Scene> difficultyScene = wnd.CreateScene("Difficulty");
+		std::shared_ptr<Scene> leaderboardScene = wnd.CreateScene("Leaderboard");
+		std::shared_ptr<Scene> nameScene = wnd.CreateScene("Name");
+		wnd.m_Scenes.push_back(minefieldScene);
+		wnd.m_Scenes.push_back(difficultyScene);
+		wnd.m_Scenes.push_back(leaderboardScene);
+		wnd.m_Scenes.push_back(nameScene);
+
 		for (int i = 0; i < 30; i++)
-			std::shared_ptr<Button> btn = mainScene->CreateEntity<Button>(std::to_wstring(i), { 32, 32 }, {i * 40 + 100, 200}, &wnd);
+		{
+			std::shared_ptr<Button> btn = minefieldScene->CreateEntity<Button>(std::to_wstring(i), { 32, 32 }, { i * 40 + 100, 200 }, &wnd);
+
+			btn->GetEventReceiver().AddHook(EventType::Command, Hook("btn.Command", [i](const EventData& data)
+			{
+				MakeError("Button " + std::to_string(i) + " clicked!");
+			}));
+		}
 
 		MSG msg = {};
 		while (GetMessage(&msg, nullptr, 0, 0))
@@ -39,7 +53,6 @@ namespace mines
 
 	void Leaderboard::RemoveEntry(const LeaderboardEntry& entry)
 	{
-		// 'erase-remove' idiom
 		auto newEnd = std::remove(m_Entries.begin(), m_Entries.end(), entry);
 		m_Entries.erase(newEnd, m_Entries.end());
 

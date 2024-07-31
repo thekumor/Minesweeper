@@ -34,6 +34,8 @@ namespace mines
 		Scene(const std::string& name = "");
 		Scene() = default;
 
+		// Creates an entity and puts it on the screen, even if scene is inactive.
+		// TODO: make it not do that.
 		template <typename T>
 		std::shared_ptr<T> CreateEntity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
 		{
@@ -44,7 +46,10 @@ namespace mines
 		
 		const std::string& GetName() const;
 
+		// Every entity that this scene had is gone upon calling.
 		void Clear();
+
+		// Entities will appear on the screen.
 		void Switch(bool on);
 
 	private:
@@ -59,14 +64,20 @@ namespace mines
 	class Window : public virtual Entity
 	{
 	public:
+		friend class Application;
+
 		Window(const Vector2<>& size, const std::wstring& title);
 		Window() = default;
 
+		// Handles window's input, output and events from WinAPI.
 		static LRESULT CALLBACK s_Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp);
+
+		// Draws a bitmap onto a context and puts it on the screen.
 		static bool s_DrawBitmap(HDC winDC, const std::wstring& path);
 
-		std::optional<std::shared_ptr<Scene>> GetSceneByName(const std::string& name = "");
+		std::shared_ptr<Scene> GetSceneByName(const std::string& name = "");
 
+		// Makes a new scene.
 		std::shared_ptr<Scene> CreateScene(const std::string& name = "");
 
 	private:

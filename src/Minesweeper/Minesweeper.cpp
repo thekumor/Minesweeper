@@ -13,6 +13,7 @@
 #include <Minesweeper/Application.h>
 #include <Minesweeper/Vectors.h>
 
+// This calls events for entities.
 mines::EventSource mines::g_EventSource;
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdShow)

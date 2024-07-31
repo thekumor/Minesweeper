@@ -51,10 +51,16 @@ namespace mines
 
 				PAINTSTRUCT ps;
 				HDC hdc = BeginPaint(handle, &ps);
-				FillRect(hdc, &ps.rcPaint, reinterpret_cast<HBRUSH>(COLOR_WINDOW + 5));
+				FillRect(hdc, &ps.rcPaint, reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1));
 				EndPaint(handle, &ps);
 
 				g_EventSource.CallEvent(EventType::PostDraw, MINES_NODATA);
+			} break;
+
+			case WM_COMMAND:
+			{
+				HWND buttonHandle = reinterpret_cast<HWND>(lp);
+				g_EventSource.CallEvent(EventType::Command, reinterpret_cast<void*>(buttonHandle), lp);
 			} break;
 
 			case WM_SIZE:
@@ -100,13 +106,13 @@ namespace mines
 		return true;
 	}
 
-	std::optional<std::shared_ptr<Scene>> Window::GetSceneByName(const std::string& name)
+	std::shared_ptr<Scene> Window::GetSceneByName(const std::string& name)
 	{
 		for (auto& ptr : m_Scenes)
 			if (ptr->GetName() == name)
 				return ptr;
 
-		return {};
+		return nullptr;
 	}
 
 	std::shared_ptr<Scene> Window::CreateScene(const std::string& name)

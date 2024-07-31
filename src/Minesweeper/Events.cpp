@@ -35,6 +35,11 @@ namespace mines
 		m_Events[eventType].Hooks.emplace_back(hook);
 	}
 
+	void EventReceiver::SetQualifier(event_qualifier qualifier)
+	{
+		m_Qualifier = qualifier;
+	}
+
 	FragileEventRecPtr EventSource::PinReceiver(EventReceiver* rec)
 	{
 		return m_Receivers.emplace_back(rec);
@@ -44,6 +49,13 @@ namespace mines
 	{
 		for (auto& rec : m_Receivers)
 			rec->FireEvent(type, eventData);
+	}
+
+	void EventSource::CallEvent(EventType type, event_qualifier qualifier, const std::any& eventData)
+	{
+		for (auto& rec : m_Receivers)
+			if (rec->m_Qualifier == qualifier)
+				rec->FireEvent(type, eventData);
 	}
 
 	mines::EventSource& EventActive::GetEventSource()

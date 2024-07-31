@@ -111,6 +111,7 @@ namespace mines
 		);
 		CheckErrors("Text.m_Handle");
 
+		GetEventReceiver().SetQualifier(reinterpret_cast<void*>(m_Handle));
 		Show();
 	}
 
@@ -132,6 +133,7 @@ namespace mines
 		);
 		CheckErrors("Button.m_Handle");
 
+		GetEventReceiver().SetQualifier(reinterpret_cast<void*>(m_Handle));
 		Show();
 	}
 
@@ -153,6 +155,7 @@ namespace mines
 		);
 		CheckErrors("EditBox.m_Handle");
 
+		GetEventReceiver().SetQualifier(reinterpret_cast<void*>(m_Handle));
 		Show();
 	}
 

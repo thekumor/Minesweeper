@@ -27,6 +27,7 @@ namespace mines
 		TimerData(const std::any& data);
 		TimerData() = default;
 
+		// Whatever you want the timer to receive.
 		std::any Data = MINES_NODATA;
 	};
 
@@ -43,10 +44,14 @@ namespace mines
 		Timer(Window* owner, std::uint32_t repetitions, std::uint32_t elapse, void (*callback)(HWND, UINT, UINT_PTR, DWORD));
 		Timer() = default;
 
+		// Is called when timer gets a tick.
 		static void CALLBACK s_TimerProc(HWND, UINT, UINT_PTR, DWORD);
 
 		std::uint64_t GetId() const;
+
 		void SetWindow(Window* window);
+
+		// Creates a WinAPI timer with member variables acting as config.
 		void Apply() const;
 
 	private:

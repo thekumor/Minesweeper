@@ -37,7 +37,6 @@ namespace mines
 		int Run();
 
 	private:
-		// Main application's window.
 		Window m_Window;
 	};
 
@@ -72,10 +71,7 @@ namespace mines
 		}
 
 	private:
-		// The name that user provided.
 		std::wstring m_PlayerName = L"";
-
-		// The score points that user has/had.
 		std::int32_t m_Score = -1;
 	};
 
@@ -102,10 +98,7 @@ namespace mines
 		void Draw();
 
 	private:
-		// Re-arranges players so it looks like an actual leader board.
 		void Sort();
-
-		// Players stored here.
 		std::vector<LeaderboardEntry> m_Entries = {};
 	};
 
