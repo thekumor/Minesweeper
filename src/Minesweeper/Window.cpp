@@ -52,6 +52,7 @@ namespace mines
 				PAINTSTRUCT ps;
 				HDC hdc = BeginPaint(handle, &ps);
 				FillRect(hdc, &ps.rcPaint, reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1));
+				s_DrawBitmap(hdc, L"images/neco_smile.bmp");
 				EndPaint(handle, &ps);
 
 				g_EventSource.CallEvent(EventType::PostDraw, MINES_NODATA);

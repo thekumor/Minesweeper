@@ -196,4 +196,25 @@ namespace mines
 		DeleteDC(hdc);
 	}
 
+	Font::Font(const std::wstring& path, std::int32_t size, bool italic, bool underline, bool strikeout)
+	{
+		m_Font = CreateFont(
+			size,
+			0,
+			0,
+			0,
+			FW_DONTCARE,
+			static_cast<DWORD>(italic),
+			static_cast<DWORD>(underline),
+			static_cast<DWORD>(strikeout),
+			DEFAULT_CHARSET,
+			OUT_OUTLINE_PRECIS,
+			CLIP_DEFAULT_PRECIS,
+			CLEARTYPE_QUALITY,
+			VARIABLE_PITCH,
+			static_cast<LPCWSTR>(path.c_str())
+		);
+		CheckErrors("Font.CreateFont");
+	}
+
 }
