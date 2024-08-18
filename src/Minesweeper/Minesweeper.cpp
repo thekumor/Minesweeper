@@ -3,7 +3,8 @@
 // Purpose: To re-create a famous minesweeper game from Windows XP
 //			which people can play.
 // 
-// Authors: The Kumor
+// Authors: The Kumor,
+//			Cat Gaeming | BendGMS | STEAM_0:1:41044407
 //****************************************************************
 
 #include <windows.h>

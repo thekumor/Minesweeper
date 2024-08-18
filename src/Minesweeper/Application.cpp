@@ -20,27 +20,15 @@ namespace mines
 		wnd.m_Scenes.push_back(leaderboardScene);
 		wnd.m_Scenes.push_back(nameScene);
 
-		std::int32_t i = 0;
-		for (int y = 0; y < 20; y++)
-			for (int x = 0; x < 30; x++)
+		for (int i = 0; i < 30; i++)
+		{
+			std::shared_ptr<Button> btn = minefieldScene->CreateEntity<Button>(std::to_wstring(i), { 32, 32 }, { i * 40 + 100, 200 }, &wnd);
+
+			btn->GetEventReceiver().AddHook(EventType::Command, Hook("btn.Command", [i](const EventData& data)
 			{
-				std::shared_ptr<Button> field = minefieldScene->CreateEntity<Button>(L"",
-					Vector2<>(32, 32), Vector2<>(x * 33 + 50, y * 33 + 150), &wnd);
-
-				i++;
-			}
-
-		std::shared_ptr<Text> timeLeft = minefieldScene->CreateEntity<Text>(L"10:00",
-			Vector2<>(100, 32), Vector2<>(50, 40), &wnd);
-
-		std::shared_ptr<Text> flagsLeft = minefieldScene->CreateEntity<Text>(L"5 flags left",
-			Vector2<>(100, 32), Vector2<>(250, 40), &wnd);
-
-		std::shared_ptr<Button> newGame = minefieldScene->CreateEntity<Button>(L"New Game",
-			Vector2<>(290, 32), Vector2<>(1100, 100), &wnd);
-
-		std::shared_ptr<Button> leaderboardButton = minefieldScene->CreateEntity<Button>(L"Leaderboard",
-			Vector2<>(290, 32), Vector2<>(1100, 150), &wnd);
+				MakeError("Button " + std::to_string(i) + " clicked!");
+			}));
+		}
 
 		MSG msg = {};
 		while (GetMessage(&msg, nullptr, 0, 0))

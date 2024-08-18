@@ -69,20 +69,6 @@ namespace mines
 		bool m_IsVisible = true;
 	};
 
-	class Font : public BaseClass
-	{
-	public:
-		friend class Text;
-
-		Font(const std::wstring& path, std::int32_t size, bool italic, bool underline, bool strikeout);
-		Font() = default;
-
-	private:
-		HFONT m_Font = nullptr;
-		std::int32_t m_Size = 0;
-		bool m_Italic = false, m_Underline = false, m_Strikeout = false;
-	};
-
 	//----------------------------------------------------------
 	// Used for displaying a string on the screen.
 	//----------------------------------------------------------
