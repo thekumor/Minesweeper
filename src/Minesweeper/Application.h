@@ -71,7 +71,7 @@ namespace mines
 		}
 
 	private:
-		std::wstring m_PlayerName = L"";
+		std::wstring m_PlayerName;
 		std::int32_t m_Score = -1;
 	};
 

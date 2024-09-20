@@ -11,26 +11,58 @@ namespace mines
 	{
 		Window& wnd = m_Window;
 
-		std::shared_ptr<Scene> minefieldScene = wnd.CreateScene("Mine field");
-		std::shared_ptr<Scene> difficultyScene = wnd.CreateScene("Difficulty");
-		std::shared_ptr<Scene> leaderboardScene = wnd.CreateScene("Leaderboard");
-		std::shared_ptr<Scene> nameScene = wnd.CreateScene("Name");
+		using ScenePtr = std::shared_ptr<Scene>;
+		using TextPtr = std::shared_ptr<Text>;
+		using ButtonPtr = std::shared_ptr<Button>;
+
+		ScenePtr minefieldScene = wnd.CreateScene("Mine field");
+		{
+			TextPtr timeLeft = minefieldScene->CreateEntity<Text>(
+				L"10:00", Vector2<>(200, 64), Vector2<>(40, 40), &wnd
+			);
+
+			TextPtr flagsLeft = minefieldScene->CreateEntity<Text>(
+				L"4 flags left", Vector2<>(200, 64), Vector2<>(280, 40), &wnd
+			);
+
+			for (std::int32_t y = 0; y < 12; y++)
+			{
+				for (std::int32_t x = 0; x < 28; x++)
+				{
+					ButtonPtr field = minefieldScene->CreateEntity<Button>(
+						L"x", Vector2<>(40, 40), Vector2<>(40 + x * 40, 200 + y * 40), &wnd
+					);
+
+					field->GetEventReceiver().AddHook(EventType::Command, Hook("Field.Test", [x, y](const EventData& data)
+					{
+						MakeError("x: " + std::to_string(x) + ", y: " + std::to_string(y));
+					}
+					));
+				}
+			}
+		}
+
+		ScenePtr difficultyScene = wnd.CreateScene("Difficulty");
+		{
+
+		}
+
+		ScenePtr leaderboardScene = wnd.CreateScene("Leaderboard");
+		{
+
+		}
+
+		ScenePtr nameScene = wnd.CreateScene("Name");
+		{
+
+		}
+
 		wnd.m_Scenes.push_back(minefieldScene);
 		wnd.m_Scenes.push_back(difficultyScene);
 		wnd.m_Scenes.push_back(leaderboardScene);
 		wnd.m_Scenes.push_back(nameScene);
 
-		for (int i = 0; i < 30; i++)
-		{
-			std::shared_ptr<Button> btn = minefieldScene->CreateEntity<Button>(std::to_wstring(i), { 32, 32 }, { i * 40 + 100, 200 }, &wnd);
-
-			btn->GetEventReceiver().AddHook(EventType::Command, Hook("btn.Command", [i](const EventData& data)
-			{
-				MakeError("Button " + std::to_string(i) + " clicked!");
-			}));
-		}
-
-		MSG msg = {};
+		MSG msg = { 0 };
 		while (GetMessage(&msg, nullptr, 0, 0))
 		{
 			TranslateMessage(&msg);

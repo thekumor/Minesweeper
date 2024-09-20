@@ -54,8 +54,8 @@ namespace mines
 
 	private:
 		bool m_Switched = true;
-		std::string m_Name = "";
-		std::vector<std::shared_ptr<Entity>> m_Entities = {};
+		std::string m_Name;
+		std::vector<std::shared_ptr<Entity>> m_Entities;
 	};
 
 	//----------------------------------------------------------
@@ -75,14 +75,14 @@ namespace mines
 		// Draws a bitmap onto a context and puts it on the screen.
 		static bool s_DrawBitmap(HDC winDC, const std::wstring& path);
 
-		std::shared_ptr<Scene> GetSceneByName(const std::string& name = "");
+		std::shared_ptr<Scene> GetSceneByName(const std::string& name);
 
 		// Makes a new scene.
-		std::shared_ptr<Scene> CreateScene(const std::string& name = "");
+		std::shared_ptr<Scene> CreateScene(const std::string& name);
 
 	private:
 		WNDCLASS m_Class = { 0 };
-		std::vector<std::shared_ptr<Scene>> m_Scenes = {};
+		std::vector<std::shared_ptr<Scene>> m_Scenes;
 	};
 
 }

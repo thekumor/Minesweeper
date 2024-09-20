@@ -64,7 +64,7 @@ namespace mines
 		FragileEntityPtr m_Parent = nullptr;
 		HWND m_Handle = nullptr;
 		Vector2<> m_Size = 0, m_OriginalSize = 0, m_Position = 0, m_OriginalPosition = 0;
-		std::wstring m_Tag = L"", m_Text = L"";
+		std::wstring m_Tag, m_Text;
 		EntityFlags m_Flags = EntityFlags::None;
 		bool m_IsVisible = true;
 	};

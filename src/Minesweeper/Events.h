@@ -55,7 +55,7 @@ namespace mines
 		Hook() = default;
 
 		// Unique identifier.
-		std::string Name = "";
+		std::string Name;
 
 		// Function that's run upon the hook is called.
 		EventCallback Callback = nullptr;
@@ -74,7 +74,7 @@ namespace mines
 		// All the hooks (and ultimately, functions) that are literally
 		// 'hooked' to this event. Meaning they're called upon event is
 		// run.
-		std::vector<Hook> Hooks = {};
+		std::vector<Hook> Hooks;
 	};
 
 	//----------------------------------------------------------
@@ -96,14 +96,23 @@ namespace mines
 
 		EventReceiver() = default;
 
+		// Runs a particular event on this receiver.
 		void FireEvent(EventType type, const std::any& eventData);
+
+		// Adds a callback function to event.
 		void AddHook(EventType eventType, const std::string& hookName, const EventCallback& callback);
+
+		// Adds a callback function to event.
 		void AddHook(EventType eventType, const Hook& hook);
+
+		// Sets it's object handle to particular address. This is done
+		// because some events are only run on a particular receiver.
+		// Example of it's use would be a button click.
 		void SetQualifier(event_qualifier qualifier);
 
 	private:
 		event_qualifier m_Qualifier = nullptr;
-		std::unordered_map<EventType, Event> m_Events = {};
+		std::unordered_map<EventType, Event> m_Events;
 	};
 
 	using FragileEventRecPtr = EventReceiver*;
@@ -116,12 +125,19 @@ namespace mines
 	public:
 		EventSource() = default;
 
+		// Adds a receiver to this source and returns it as a pointer
+		// from within vector of receivers.
 		FragileEventRecPtr PinReceiver(EventReceiver* rec);
+
+		// Runs a particular event on all of it's receivers.
 		void CallEvent(EventType type, const std::any& eventData);
+
+		// Runs a particular event on particular receivers (usually one).
+		// Example of it's use would be a button click.
 		void CallEvent(EventType type, event_qualifier qualifier, const std::any& eventData);
 
 	private:
-		std::vector<FragileEventRecPtr> m_Receivers = {};
+		std::vector<FragileEventRecPtr> m_Receivers;
 	};
 
 	//----------------------------------------------------------
