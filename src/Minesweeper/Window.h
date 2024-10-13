@@ -37,7 +37,7 @@ namespace mines
 		// Creates an entity and puts it on the screen, even if scene is inactive.
 		// TODO: make it not do that.
 		template <typename T>
-		std::shared_ptr<T> CreateEntity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
+		std::shared_ptr<T> CreateEntity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent)
 		{
 			std::shared_ptr<T> ent = std::make_shared<T>(text, size, position, parent);
 			m_Entities.push_back(ent);
@@ -61,7 +61,7 @@ namespace mines
 	//----------------------------------------------------------
 	// A window that can contains scenes that can be swapped.
 	//----------------------------------------------------------
-	class Window : public virtual Entity
+	class Window : public Entity
 	{
 	public:
 		friend class Application;

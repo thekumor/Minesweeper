@@ -35,6 +35,14 @@ namespace mines
 		ShowWindow(m_Handle, SW_SHOW);
 	}
 
+	static void OnWindowResize(HWND handle, WPARAM wp, LPARAM lp)
+	{
+		RECT lpRect = { 0 };
+		GetWindowRect(handle, &lpRect);
+		WORD width = lpRect.right - lpRect.left;
+		WORD height = lpRect.bottom - lpRect.top;
+		g_EventSource.CallEvent(EventType::Resize, Vector2<WORD>(width, height));
+	}
 	LRESULT CALLBACK Window::s_Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp)
 	{
 		switch (msg)
@@ -63,11 +71,17 @@ namespace mines
 				g_EventSource.CallEvent(EventType::Command, reinterpret_cast<void*>(buttonHandle), lp);
 			} break;
 
+			case WM_EXITSIZEMOVE:
+			{
+				OnWindowResize(handle, wp, lp);
+			} break;
+
 			case WM_SIZE:
 			{
-				WORD width = LOWORD(lp);
-				WORD height = HIWORD(lp);
-				g_EventSource.CallEvent(EventType::Resize, Vector2<WORD>(width, height));
+				if (wp == SIZE_MAXIMIZED || wp == SIZE_MAXSHOW)
+				{
+					OnWindowResize(handle, wp, lp);
+				}
 			} break;
 		}
 

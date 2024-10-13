@@ -17,7 +17,7 @@ mines::EventSource mines::g_EventSource;
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdShow)
 {
-	mines::Application app(mines::Vector2<>(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
+	mines::Application app(mines::Vec2(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 	return app.Run();
 }
 

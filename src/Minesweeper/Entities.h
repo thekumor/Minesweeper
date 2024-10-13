@@ -25,9 +25,6 @@
 namespace mines
 {
 
-	class Entity;
-	using FragileEntityPtr = Entity*;
-
 	enum class EntityFlags : std::uint8_t
 	{
 		None = 0,
@@ -41,10 +38,16 @@ namespace mines
 	class Entity : public BaseClass
 	{
 	public:
-		Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent,
+		friend class Text;
+		friend class Button;
+		friend class EditBox;
+		friend class Img;
+		friend class Timer;
+
+		Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent,
 			EntityFlags flags = EntityFlags::None);
 		Entity() = default;
-		virtual ~Entity() = default;
+		~Entity() = default;
 
 		HWND GetHandle() const;
 
@@ -58,10 +61,8 @@ namespace mines
 		void Hide();
 		void Close();
 
-		operator HWND();
-
 	protected:
-		FragileEntityPtr m_Parent = nullptr;
+		Entity* m_Parent = nullptr;
 		HWND m_Handle = nullptr;
 		Vector2<> m_Size = 0, m_OriginalSize = 0, m_Position = 0, m_OriginalPosition = 0;
 		std::wstring m_Tag, m_Text;
@@ -72,40 +73,40 @@ namespace mines
 	//----------------------------------------------------------
 	// Used for displaying a string on the screen.
 	//----------------------------------------------------------
-	class Text : public virtual Entity
+	class Text : public Entity
 	{
 	public:
-		Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent);
+		Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent);
 		Text() = default;
 	};
 
 	//----------------------------------------------------------
 	// Used for user input - mouse.
 	//----------------------------------------------------------
-	class Button : public virtual Entity
+	class Button : public Entity
 	{
 	public:
-		Button(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent);
+		Button(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent);
 		Button() = default;
 	};
 
 	//----------------------------------------------------------
 	// Used for user input - keyboard.
 	//----------------------------------------------------------
-	class EditBox : public virtual Entity
+	class EditBox : public Entity
 	{
 	public:
-		EditBox(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent);
+		EditBox(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent);
 		EditBox() = default;
 	};
 
 	//----------------------------------------------------------
 	// An image that can be drawn to the screen.
 	//----------------------------------------------------------
-	class Img : public virtual Entity
+	class Img : public Entity
 	{
 	public:
-		Img(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent);
+		Img(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent);
 		Img() = default;
 		~Img();
 

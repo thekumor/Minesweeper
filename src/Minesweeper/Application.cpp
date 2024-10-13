@@ -18,11 +18,11 @@ namespace mines
 		ScenePtr minefieldScene = wnd.CreateScene("Mine field");
 		{
 			TextPtr timeLeft = minefieldScene->CreateEntity<Text>(
-				L"10:00", Vector2<>(200, 64), Vector2<>(40, 40), &wnd
+				L"10:00", Vec2(200, 64), Vec2(40, 40), &wnd
 			);
 
 			TextPtr flagsLeft = minefieldScene->CreateEntity<Text>(
-				L"4 flags left", Vector2<>(200, 64), Vector2<>(280, 40), &wnd
+				L"4 flags left", Vec2(200, 64), Vec2(280, 40), &wnd
 			);
 
 			for (std::int32_t y = 0; y < 12; y++)
@@ -30,7 +30,7 @@ namespace mines
 				for (std::int32_t x = 0; x < 28; x++)
 				{
 					ButtonPtr field = minefieldScene->CreateEntity<Button>(
-						L"x", Vector2<>(40, 40), Vector2<>(40 + x * 40, 200 + y * 40), &wnd
+						L"x", Vec2(40, 40), Vec2(40 + x * 40, 200 + y * 40), &wnd
 					);
 
 					field->GetEventReceiver().AddHook(EventType::Command, Hook("Field.Test", [x, y](const EventData& data)

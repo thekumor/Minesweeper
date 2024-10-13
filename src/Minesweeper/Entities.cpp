@@ -3,7 +3,7 @@
 namespace mines
 {
 
-	Entity::Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent,
+	Entity::Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent,
 		EntityFlags flags)
 		: m_Parent(parent), m_Size(size), m_OriginalSize(size), m_Position(position), m_Text(text), m_Flags(flags)
 	{
@@ -83,17 +83,12 @@ namespace mines
 		CloseWindow(m_Handle);
 	}
 
-	Entity::operator HWND()
-	{
-		return GetHandle();
-	}
-
 	void Entity::Reposition(const Vector2<>& position)
 	{
 		SetWindowPos(m_Handle, nullptr, position.x, position.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	}
 
-	Text::Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
+	Text::Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent)
 		: Entity(text, size, position, parent)
 	{
 		m_Handle = CreateWindow(
@@ -104,7 +99,7 @@ namespace mines
 			position.y,
 			size.x,
 			size.y,
-			(parent ? static_cast<HWND>(*parent) : nullptr),
+			(parent ? parent->m_Handle : nullptr),
 			nullptr,
 			reinterpret_cast<HINSTANCE>(GetModuleHandle(nullptr)),
 			0
@@ -115,7 +110,7 @@ namespace mines
 		Show();
 	}
 
-	Button::Button(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
+	Button::Button(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent)
 		: Entity(text, size, position, parent)
 	{
 		m_Handle = CreateWindow(
@@ -126,7 +121,7 @@ namespace mines
 			position.y,
 			size.x,
 			size.y,
-			(parent ? static_cast<HWND>(*parent) : nullptr),
+			(parent ? parent->m_Handle : nullptr),
 			nullptr,
 			reinterpret_cast<HINSTANCE>(GetModuleHandle(nullptr)),
 			0
@@ -137,7 +132,7 @@ namespace mines
 		Show();
 	}
 
-	EditBox::EditBox(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
+	EditBox::EditBox(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent)
 		: Entity(text, size, position, parent)
 	{
 		m_Handle = CreateWindow(
@@ -148,7 +143,7 @@ namespace mines
 			position.y,
 			size.x,
 			size.y,
-			(parent ? static_cast<HWND>(*parent) : nullptr),
+			(parent ? parent->m_Handle : nullptr),
 			nullptr,
 			reinterpret_cast<HINSTANCE>(GetModuleHandle(nullptr)),
 			0
@@ -159,7 +154,7 @@ namespace mines
 		Show();
 	}
 
-	Img::Img(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, FragileEntityPtr parent)
+	Img::Img(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent)
 		: Entity(text, size, position, parent)
 	{
 		m_HandleBitmap = static_cast<HBITMAP>(LoadImage(nullptr, text.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));

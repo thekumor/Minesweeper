@@ -10,6 +10,8 @@
 
 #include <cstdint>
 
+#define Vec2 Vector2<>
+
 namespace mines
 {
 
