@@ -31,6 +31,11 @@ namespace mines
 		MINES_PIN_THIS();
 	}
 
+	Entity::~Entity()
+	{
+		DeleteObject(m_Handle);
+	}
+
 	HWND Entity::GetHandle() const
 	{
 		return m_Handle;
@@ -78,6 +83,11 @@ namespace mines
 		m_Flags = flags;
 	}
 
+	void Entity::SetFont(const Font& font)
+	{
+		SendMessage(m_Handle, WM_SETFONT, reinterpret_cast<WPARAM>(font.m_Handle), TRUE);
+	}
+
 	void Entity::Close()
 	{
 		CloseWindow(m_Handle);
@@ -108,6 +118,12 @@ namespace mines
 
 		GetEventReceiver().SetQualifier(reinterpret_cast<void*>(m_Handle));
 		Show();
+	}
+
+	Text::Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent, const Font& font)
+		: Text(text, size, position, parent)
+	{
+		SetFont(font);
 	}
 
 	Button::Button(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent)

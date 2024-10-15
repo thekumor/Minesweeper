@@ -4,5 +4,5 @@
 
 @ECHO OFF
 
-powershell -ExecutionPolicy Bypass -File scripts/generate.ps1
+powershell -ExecutionPolicy Bypass -File scripts/build.ps1
 PAUSE

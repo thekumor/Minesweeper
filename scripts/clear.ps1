@@ -4,7 +4,7 @@
 # ==================================================
 
 # Sets which files are to be kept.
-$Whitelist = ".git","src","scripts","vs2022-old","clear.bat","generate.bat","CMakeLists.txt",".gitignore"
+$Whitelist = ".git","src","scripts","vs2022-old","clear.bat","build.bat","CMakeLists.txt",".gitignore"
 
 # Gets the current directory's structure.
 $Files = Get-ChildItem

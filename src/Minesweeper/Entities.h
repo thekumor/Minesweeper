@@ -19,6 +19,7 @@
 #include <Minesweeper/Vectors.h>
 #include <Minesweeper/Errors.h>
 #include <Minesweeper/Events.h>
+#include <Minesweeper/Utility.h>
 
 #define HAS_FLAG(var,val) ((std::int32_t(var) & std::int32_t(val)) != 0)
 
@@ -47,7 +48,7 @@ namespace mines
 		Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent,
 			EntityFlags flags = EntityFlags::None);
 		Entity() = default;
-		~Entity() = default;
+		~Entity();
 
 		HWND GetHandle() const;
 
@@ -57,6 +58,7 @@ namespace mines
 		void Reposition(const Vector2<>& position);
 		void SetText(const std::wstring& text);
 		void SetFlags(EntityFlags flags);
+		void SetFont(const Font& font);
 		void Show();
 		void Hide();
 		void Close();
@@ -77,6 +79,7 @@ namespace mines
 	{
 	public:
 		Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent);
+		Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent, const Font& font);
 		Text() = default;
 	};
 

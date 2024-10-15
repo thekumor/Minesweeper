@@ -15,15 +15,20 @@ namespace mines
 		using TextPtr = std::shared_ptr<Text>;
 		using ButtonPtr = std::shared_ptr<Button>;
 
+		Font defaultFont(L"Verdana", 16);
+		Font bigFont(L"Verdana", 36);
+
 		ScenePtr minefieldScene = wnd.CreateScene("Mine field");
 		{
 			TextPtr timeLeft = minefieldScene->CreateEntity<Text>(
 				L"10:00", Vec2(200, 64), Vec2(40, 40), &wnd
 			);
+			timeLeft->SetFont(bigFont);
 
 			TextPtr flagsLeft = minefieldScene->CreateEntity<Text>(
 				L"4 flags left", Vec2(200, 64), Vec2(280, 40), &wnd
 			);
+			flagsLeft->SetFont(bigFont);
 
 			for (std::int32_t y = 0; y < 12; y++)
 			{
@@ -32,6 +37,7 @@ namespace mines
 					ButtonPtr field = minefieldScene->CreateEntity<Button>(
 						L"x", Vec2(40, 40), Vec2(40 + x * 40, 200 + y * 40), &wnd
 					);
+					field->SetFont(defaultFont);
 
 					field->GetEventReceiver().AddHook(EventType::Command, Hook("Field.Test", [x, y](const EventData& data)
 					{
