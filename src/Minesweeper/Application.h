@@ -31,7 +31,7 @@ namespace mines
 	class Application : public BaseClass
 	{
 	public:
-		Application(const Vector2<>& windowSize, const std::wstring& windowTitle);
+		Application(const Vec2& windowSize, const std::wstring& windowTitle);
 		Application() = default;
 
 		// Runs the application and puts it into it's main loop.

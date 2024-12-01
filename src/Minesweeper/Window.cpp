@@ -3,8 +3,8 @@
 namespace mines
 {
 
-	Window::Window(const Vector2<>& size, const std::wstring& title)
-		: Entity(title, size, { CW_USEDEFAULT, CW_USEDEFAULT }, nullptr, EntityFlags::IgnoreResize)
+	Window::Window(const Vec2& size, const std::wstring& title)
+		: Control(title, size, { CW_USEDEFAULT, CW_USEDEFAULT }, nullptr, ControlFlags::IgnoreResize)
 	{
 		HINSTANCE instance = reinterpret_cast<HINSTANCE>(GetModuleHandle(nullptr));
 		const std::wstring className = L"Minesweeper Window";
@@ -35,13 +35,10 @@ namespace mines
 		ShowWindow(m_Handle, SW_SHOW);
 	}
 
-	static void OnWindowResize(HWND handle, WPARAM wp, LPARAM lp)
+	static void s_OnWindowResize(HWND handle, WPARAM wp, LPARAM lp)
 	{
-		RECT lpRect = { 0 };
-		GetWindowRect(handle, &lpRect);
-		WORD width = lpRect.right - lpRect.left;
-		WORD height = lpRect.bottom - lpRect.top;
-		g_EventSource.CallEvent(EventType::Resize, Vector2<WORD>(width, height));
+		Vector2<WORD> size = Window::s_GetSize(handle);
+		g_EventSource.CallEvent(EventType::Resize, size);
 	}
 	LRESULT CALLBACK Window::s_Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp)
 	{
@@ -50,7 +47,7 @@ namespace mines
 			case WM_CLOSE:
 			{
 				g_EventSource.CallEvent(EventType::Close, MINES_NODATA);
-				PostQuitMessage(0);
+				PostQuitMessage(EXIT_SUCCESS);
 			} break;
 
 			case WM_PAINT:
@@ -73,14 +70,14 @@ namespace mines
 
 			case WM_EXITSIZEMOVE:
 			{
-				OnWindowResize(handle, wp, lp);
+				s_OnWindowResize(handle, wp, lp);
 			} break;
 
 			case WM_SIZE:
 			{
 				if (wp == SIZE_MAXIMIZED || wp == SIZE_MAXSHOW)
 				{
-					OnWindowResize(handle, wp, lp);
+					s_OnWindowResize(handle, wp, lp);
 				}
 			} break;
 		}
@@ -118,6 +115,22 @@ namespace mines
 		DeleteObject(handleBitmap);
 
 		return true;
+	}
+
+	mines::Vector2<WORD> Window::s_GetSize(HWND handle)
+	{
+		RECT lpRect = { 0 };
+		GetWindowRect(handle, &lpRect);
+		CheckErrors("GetWindowRect");
+		WORD width = lpRect.right - lpRect.left;
+		WORD height = lpRect.bottom - lpRect.top;
+
+		return Vector2<WORD>(width, height);
+	}
+
+	mines::Vector2<WORD> Window::s_GetSize()
+	{
+		return Window::s_GetSize(m_Handle);
 	}
 
 	std::shared_ptr<Scene> Window::GetSceneByName(const std::string& name)

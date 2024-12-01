@@ -23,13 +23,17 @@
 namespace mines
 {
 
+	class EventSource;
+	extern EventSource g_EventSource;
+
 	typedef void* event_qualifier;
 
 	enum class EventType : std::int32_t
 	{
 		Invalid = 0,
 		Tick, Update, PreDraw, PostDraw,
-		Timer, Command, Close, Resize
+		Timer, Command, Close, Resize,
+		Destroy
 	};
 
 	//----------------------------------------------------------
@@ -105,6 +109,9 @@ namespace mines
 		// Adds a callback function to event.
 		void AddHook(EventType eventType, const Hook& hook);
 
+		// Replaces a hook under given event that has a specified name.
+		void ReplaceHook(EventType eventType, const Hook& hook);
+
 		// Sets it's object handle to particular address. This is done
 		// because some events are only run on a particular receiver.
 		// Example of it's use would be a button click.
@@ -114,8 +121,6 @@ namespace mines
 		event_qualifier m_Qualifier = nullptr;
 		std::unordered_map<EventType, Event> m_Events;
 	};
-
-	using FragileEventRecPtr = EventReceiver*;
 
 	//----------------------------------------------------------
 	// Tells all the receivers inside it to run callbacks.
@@ -127,7 +132,7 @@ namespace mines
 
 		// Adds a receiver to this source and returns it as a pointer
 		// from within vector of receivers.
-		FragileEventRecPtr PinReceiver(EventReceiver* rec);
+		EventReceiver* PinReceiver(EventReceiver* rec);
 
 		// Runs a particular event on all of it's receivers.
 		void CallEvent(EventType type, const std::any& eventData);
@@ -136,8 +141,11 @@ namespace mines
 		// Example of it's use would be a button click.
 		void CallEvent(EventType type, event_qualifier qualifier, const std::any& eventData);
 
+		// Detaches given receiver.
+		void UnpinReceiver(EventReceiver* m_EventReceiver);
+
 	private:
-		std::vector<FragileEventRecPtr> m_Receivers;
+		std::vector<EventReceiver*> m_Receivers;
 	};
 
 	//----------------------------------------------------------
@@ -155,7 +163,8 @@ namespace mines
 	class EventActive : public EventBase
 	{
 	public:
-		EventActive() = default;
+		EventActive();
+		~EventActive();
 
 		EventSource& GetEventSource();
 		EventReceiver& GetEventReceiver();

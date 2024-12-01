@@ -2,7 +2,7 @@
 
 namespace mines
 {
-	Application::Application(const Vector2<>& windowSize, const std::wstring& windowTitle)
+	Application::Application(const Vec2& windowSize, const std::wstring& windowTitle)
 		: m_Window(windowSize, windowTitle)
 	{
 	}
@@ -15,35 +15,29 @@ namespace mines
 		using TextPtr = std::shared_ptr<Text>;
 		using ButtonPtr = std::shared_ptr<Button>;
 
-		Font defaultFont(L"Verdana", 16);
-		Font bigFont(L"Verdana", 36);
+		Font defaultFont(L"Verdana", 16, wnd.m_Handle);
+		Font bigFont(L"Verdana", 36, wnd.m_Handle);
 
 		ScenePtr minefieldScene = wnd.CreateScene("Mine field");
 		{
-			TextPtr timeLeft = minefieldScene->CreateEntity<Text>(
+			TextPtr timeLeft = minefieldScene->CreateControl<Text>(
 				L"10:00", Vec2(200, 64), Vec2(40, 40), &wnd
 			);
-			timeLeft->SetFont(bigFont);
+			timeLeft->SetFont(&bigFont);
 
-			TextPtr flagsLeft = minefieldScene->CreateEntity<Text>(
+			TextPtr flagsLeft = minefieldScene->CreateControl<Text>(
 				L"4 flags left", Vec2(200, 64), Vec2(280, 40), &wnd
 			);
-			flagsLeft->SetFont(bigFont);
+			flagsLeft->SetFont(&bigFont);
 
 			for (std::int32_t y = 0; y < 12; y++)
 			{
 				for (std::int32_t x = 0; x < 28; x++)
 				{
-					ButtonPtr field = minefieldScene->CreateEntity<Button>(
+					ButtonPtr field = minefieldScene->CreateControl<Button>(
 						L"x", Vec2(40, 40), Vec2(40 + x * 40, 200 + y * 40), &wnd
 					);
-					field->SetFont(defaultFont);
-
-					field->GetEventReceiver().AddHook(EventType::Command, Hook("Field.Test", [x, y](const EventData& data)
-					{
-						MakeError("x: " + std::to_string(x) + ", y: " + std::to_string(y));
-					}
-					));
+					field->SetFont(&defaultFont);
 				}
 			}
 		}
@@ -68,7 +62,7 @@ namespace mines
 		wnd.m_Scenes.push_back(leaderboardScene);
 		wnd.m_Scenes.push_back(nameScene);
 
-		MSG msg = { 0 };
+		MSG msg;
 		while (GetMessage(&msg, nullptr, 0, 0))
 		{
 			TranslateMessage(&msg);

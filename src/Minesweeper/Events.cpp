@@ -40,7 +40,21 @@ namespace mines
 		m_Qualifier = qualifier;
 	}
 
-	FragileEventRecPtr EventSource::PinReceiver(EventReceiver* rec)
+	void EventReceiver::ReplaceHook(EventType eventType, const Hook& hook)
+	{
+		std::vector<Hook>& hooks = m_Events[eventType].Hooks;
+
+		for (std::vector<Hook>::iterator it = hooks.begin(); it != hooks.end(); it++)
+		{
+			if (it->Name == hook.Name)
+			{
+				it->Callback = hook.Callback;
+				break;
+			}
+		}
+	}
+
+	EventReceiver* EventSource::PinReceiver(EventReceiver* rec)
 	{
 		return m_Receivers.emplace_back(rec);
 	}
@@ -58,6 +72,14 @@ namespace mines
 				rec->FireEvent(type, eventData);
 	}
 
+	void EventSource::UnpinReceiver(EventReceiver* m_EventReceiver)
+	{
+		std::vector<EventReceiver*>::iterator it = std::find(m_Receivers.begin(), m_Receivers.end(), m_EventReceiver);
+
+		if (it != m_Receivers.end())
+			m_Receivers.erase(it);
+	}
+
 	mines::EventSource& EventActive::GetEventSource()
 	{
 		return m_EventSource;
@@ -66,6 +88,23 @@ namespace mines
 	mines::EventReceiver& EventActive::GetEventReceiver()
 	{
 		return m_EventReceiver;
+	}
+
+	EventActive::EventActive()
+	{
+		MINES_PIN_THIS();
+
+		m_EventReceiver.AddHook(EventType::Destroy, Hook("EventActive.Destroy", [&](const EventData& data)
+		{
+			EventReceiver* destroyedReceiver = std::any_cast<EventReceiver*>(data.Value);
+			m_EventSource.UnpinReceiver(destroyedReceiver);
+		}));
+	}
+
+	EventActive::~EventActive()
+	{
+		g_EventSource.UnpinReceiver(&m_EventReceiver);
+		g_EventSource.CallEvent(EventType::Destroy, &m_EventReceiver);
 	}
 
 }

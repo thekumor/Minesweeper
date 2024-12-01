@@ -3,103 +3,134 @@
 namespace mines
 {
 
-	Entity::Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent,
-		EntityFlags flags)
-		: m_Parent(parent), m_Size(size), m_OriginalSize(size), m_Position(position), m_Text(text), m_Flags(flags)
+	Control::Control(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent, ControlFlags flags)
+		: m_Parent(parent), m_Size(size), m_TranslatedSize(size), m_Position(position), m_TranslatedPosition(position),
+		m_Text(text), m_Flags(flags)
 	{
-		m_EventReceiver.AddHook(EventType::Resize, Hook(
-			"Entity.Resize",
-			[this](const EventData& data)
+		m_EventReceiver.AddHook(EventType::Resize, Hook("Control.Resize", [this](const EventData& data)
 		{
-			if (!HAS_FLAG(m_Flags, EntityFlags::IgnoreResize))
+			if (!HAS_FLAG(m_Flags, ControlFlags::IgnoreResize))
 			{
-				Vector2<WORD> oldWindowSize = { WINDOW_WIDTH, WINDOW_HEIGHT };
-				Vector2<WORD> newWindowSize = std::any_cast<Vector2<WORD>>(data.Value);
-
-				Vector2<float> fraction(
-					static_cast<float>(newWindowSize.x) / oldWindowSize.x,
-					static_cast<float>(newWindowSize.y) / oldWindowSize.y
-				);
-
-				const Vector2<> newSize = m_Size * fraction;
-				const Vector2<> newPosition = m_Position * fraction;
-				this->Resize(newSize);
-				this->Reposition(newPosition);
+				// Doesn't change the size, just re-translates it to fit the new resolution.
+				SetSize(m_Size);
+				SetPosition(m_Position);
 			}
 		}
 		));
-		MINES_PIN_THIS();
 	}
 
-	Entity::~Entity()
+	Control::~Control()
 	{
 		DeleteObject(m_Handle);
 	}
 
-	HWND Entity::GetHandle() const
+	HWND Control::GetHandle() const
 	{
 		return m_Handle;
 	}
 
-	void Entity::SetPosition(const Vector2<>& position)
+	void Control::SetPosition(const Vec2& position)
 	{
 		m_Position = position;
-		m_OriginalPosition = position;
-		SetWindowPos(m_Handle, nullptr, position.x, position.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
+		if (m_Parent)
+		{
+			HWND parentHandle = m_Parent->m_Handle;
+			RECT rect;
+
+			if (GetWindowRect(parentHandle, &rect))
+			{
+				Vector2<LONG> parentSize = { rect.right - rect.left, rect.bottom - rect.top };
+				Vector2<std::int32_t> originalParentSize = m_Parent->m_Size;
+				Vector2<float> fraction = {
+					static_cast<float>(parentSize.x) / originalParentSize.x,
+					static_cast<float>(parentSize.y) / originalParentSize.y
+				};
+
+				m_TranslatedPosition = m_Position * fraction;
+			}
+		}
+		else
+			m_TranslatedPosition = position;
+
+		SetWindowPos(m_Handle, nullptr, m_TranslatedPosition.x, m_TranslatedPosition.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	}
 
-	void Entity::SetSize(const Vector2<>& size)
+	void Control::SetSize(const Vec2& size)
 	{
 		m_Size = size;
-		m_OriginalSize = size;
-		SetWindowPos(m_Handle, nullptr, 0, 0, size.x, size.y, SWP_NOMOVE | SWP_NOZORDER);
+
+		if (m_Parent)
+		{
+			HWND parentHandle = m_Parent->m_Handle;
+			RECT rect;
+			if (GetWindowRect(parentHandle, &rect))
+			{
+				Vector2<LONG> parentSize = { rect.right - rect.left, rect.bottom - rect.top };
+				Vector2<std::int32_t> originalParentSize = m_Parent->m_Size;
+				Vector2<float> fraction = {
+					static_cast<float>(parentSize.x) / originalParentSize.x,
+					static_cast<float>(parentSize.y) / originalParentSize.y
+				};
+
+				m_TranslatedSize = m_Size * fraction;
+			}
+		}
+		else
+			m_TranslatedSize = size;
+
+		SetWindowPos(m_Handle, nullptr, 0, 0, m_TranslatedSize.x, m_TranslatedSize.y, SWP_NOMOVE | SWP_NOZORDER);
 	}
 
-	void Entity::Resize(const Vector2<>& size)
-	{
-		SetWindowPos(m_Handle, nullptr, 0, 0, size.x, size.y, SWP_NOMOVE | SWP_NOZORDER);
-	}
-
-	void Entity::SetText(const std::wstring& text)
+	void Control::SetText(const std::wstring& text)
 	{
 		m_Text = text;
 		SetWindowText(m_Handle, text.c_str());
 	}
 
-	void Entity::Show()
+	void Control::Show()
 	{
 		m_IsVisible = true;
 		ShowWindow(m_Handle, SW_SHOW);
 	}
 
-	void Entity::Hide()
+	void Control::Hide()
 	{
 		m_IsVisible = false;
 		ShowWindow(m_Handle, SW_HIDE);
 	}
 
-	void Entity::SetFlags(EntityFlags flags)
+	void Control::SetFlags(ControlFlags flags)
 	{
 		m_Flags = flags;
 	}
 
-	void Entity::SetFont(const Font& font)
+	void Control::SetFont(Font* font)
 	{
-		SendMessage(m_Handle, WM_SETFONT, reinterpret_cast<WPARAM>(font.m_Handle), TRUE);
+		SendMessage(m_Handle, WM_SETFONT, reinterpret_cast<WPARAM>(font->m_Handle), TRUE);
+
+		if (m_Font)
+			m_Font->m_EventSource.UnpinReceiver(&m_EventReceiver);
+
+		if (font)
+			font->m_EventSource.PinReceiver(&m_EventReceiver);
+
+		m_Font = font;
+
+		m_EventReceiver.ReplaceHook(EventType::Update, Hook("Control.FontUpdate", [this](const EventData& data)
+		{
+			HFONT fontHandle = std::any_cast<HFONT>(data.Value);
+			SendMessage(m_Handle, WM_SETFONT, reinterpret_cast<WPARAM>(fontHandle), TRUE);
+		}));
 	}
 
-	void Entity::Close()
+	void Control::Close()
 	{
 		CloseWindow(m_Handle);
 	}
 
-	void Entity::Reposition(const Vector2<>& position)
-	{
-		SetWindowPos(m_Handle, nullptr, position.x, position.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-	}
-
-	Text::Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent)
-		: Entity(text, size, position, parent)
+	Text::Text(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent)
+		: Control(text, size, position, parent)
 	{
 		m_Handle = CreateWindow(
 			L"Static",
@@ -116,18 +147,18 @@ namespace mines
 		);
 		CheckErrors("Text.m_Handle");
 
-		GetEventReceiver().SetQualifier(reinterpret_cast<void*>(m_Handle));
+		GetEventReceiver().SetQualifier(reinterpret_cast<event_qualifier>(m_Handle));
 		Show();
 	}
 
-	Text::Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent, const Font& font)
+	Text::Text(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent, Font* font)
 		: Text(text, size, position, parent)
 	{
 		SetFont(font);
 	}
 
-	Button::Button(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent)
-		: Entity(text, size, position, parent)
+	Button::Button(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent)
+		: Control(text, size, position, parent)
 	{
 		m_Handle = CreateWindow(
 			L"Button",
@@ -144,12 +175,12 @@ namespace mines
 		);
 		CheckErrors("Button.m_Handle");
 
-		GetEventReceiver().SetQualifier(reinterpret_cast<void*>(m_Handle));
+		GetEventReceiver().SetQualifier(reinterpret_cast<event_qualifier>(m_Handle));
 		Show();
 	}
 
-	EditBox::EditBox(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent)
-		: Entity(text, size, position, parent)
+	EditBox::EditBox(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent)
+		: Control(text, size, position, parent)
 	{
 		m_Handle = CreateWindow(
 			L"Edit",
@@ -166,12 +197,12 @@ namespace mines
 		);
 		CheckErrors("EditBox.m_Handle");
 
-		GetEventReceiver().SetQualifier(reinterpret_cast<void*>(m_Handle));
+		GetEventReceiver().SetQualifier(reinterpret_cast<event_qualifier>(m_Handle));
 		Show();
 	}
 
-	Img::Img(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent)
-		: Entity(text, size, position, parent)
+	Img::Img(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent)
+		: Control(text, size, position, parent)
 	{
 		m_HandleBitmap = static_cast<HBITMAP>(LoadImage(nullptr, text.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
 		CheckErrors("LoadImage");

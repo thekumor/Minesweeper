@@ -7,7 +7,10 @@
 
 #pragma once
 
-#include <Minesweeper/Events.h>
+#include <Windows.h>
+
+#include <Minesweeper/Errors.h>
+#include <Minesweeper/Vectors.h>
 
 #define WINDOW_WIDTH 1440
 #define WINDOW_HEIGHT 900
@@ -16,7 +19,8 @@
 namespace mines
 {
 
-	extern mines::EventSource g_EventSource;
+	using WindowSize = Vector2<WORD>;
+	WindowSize GetWindowSize(HWND);
 
 }
 

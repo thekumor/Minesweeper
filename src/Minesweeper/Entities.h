@@ -26,7 +26,7 @@
 namespace mines
 {
 
-	enum class EntityFlags : std::uint8_t
+	enum class ControlFlags : std::uint8_t
 	{
 		None = 0,
 		IgnoreResize
@@ -36,7 +36,7 @@ namespace mines
 	// Main class used for controls & things you see on
 	// the screen.
 	//----------------------------------------------------------
-	class Entity : public BaseClass
+	class Control : public BaseClass
 	{
 	public:
 		friend class Text;
@@ -45,71 +45,70 @@ namespace mines
 		friend class Img;
 		friend class Timer;
 
-		Entity(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent,
-			EntityFlags flags = EntityFlags::None);
-		Entity() = default;
-		~Entity();
+		Control(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent,
+			ControlFlags flags = ControlFlags::None);
+		Control() = default;
+		~Control();
 
 		HWND GetHandle() const;
 
-		void SetPosition(const Vector2<>& position);
-		void SetSize(const Vector2<>& size);
-		void Resize(const Vector2<>& size);
-		void Reposition(const Vector2<>& position);
+		void SetPosition(const Vec2& position);
+		void SetSize(const Vec2& size);
 		void SetText(const std::wstring& text);
-		void SetFlags(EntityFlags flags);
-		void SetFont(const Font& font);
+		void SetFlags(ControlFlags flags);
+		void SetFont(Font* font);
 		void Show();
 		void Hide();
 		void Close();
 
 	protected:
-		Entity* m_Parent = nullptr;
+		Control* m_Parent = nullptr;
+		Font* m_Font = nullptr;
 		HWND m_Handle = nullptr;
-		Vector2<> m_Size = 0, m_OriginalSize = 0, m_Position = 0, m_OriginalPosition = 0;
+		Vector2<> m_Size = 0, m_TranslatedSize = 0, m_Position = 0, m_TranslatedPosition = 0;
 		std::wstring m_Tag, m_Text;
-		EntityFlags m_Flags = EntityFlags::None;
+		ControlFlags m_Flags = ControlFlags::None;
 		bool m_IsVisible = true;
 	};
 
 	//----------------------------------------------------------
 	// Used for displaying a string on the screen.
 	//----------------------------------------------------------
-	class Text : public Entity
+	class Text : public Control
 	{
 	public:
-		Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent);
-		Text(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent, const Font& font);
+		Text(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent);
+		Text(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent, Font* font);
 		Text() = default;
 	};
 
 	//----------------------------------------------------------
 	// Used for user input - mouse.
 	//----------------------------------------------------------
-	class Button : public Entity
+	class Button : public Control
 	{
 	public:
-		Button(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent);
+		Button(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent);
 		Button() = default;
 	};
 
 	//----------------------------------------------------------
 	// Used for user input - keyboard.
 	//----------------------------------------------------------
-	class EditBox : public Entity
+	class EditBox : public Control
 	{
 	public:
-		EditBox(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent);
+		EditBox(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent);
 		EditBox() = default;
 	};
 
 	//----------------------------------------------------------
 	// An image that can be drawn to the screen.
 	//----------------------------------------------------------
-	class Img : public Entity
+	class Img : public Control
 	{
 	public:
-		Img(const std::wstring& text, const Vector2<>& size, const Vector2<>& position, Entity* parent);
+		Img(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent);
 		Img() = default;
 		~Img();
 
