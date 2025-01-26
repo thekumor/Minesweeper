@@ -1,17 +1,20 @@
-//****************************************************************
+//********************************************************************************************
 // File: Utility.h
 // Purpose: Contains font.
 // 
 // Authors: The Kumor
-//****************************************************************
+//********************************************************************************************
 
 #pragma once
 
-#include <windows.h>
-
+// STL
 #include <string>
 #include <cmath>
 
+// WinAPI
+#include <windows.h>
+
+// Minesweeper
 #include <Minesweeper/BaseClass.h>
 #include <Minesweeper/Errors.h>
 #include <Minesweeper/Global.h>
@@ -19,22 +22,25 @@
 
 namespace mines
 {
+
+	//------------------------------------------------------------------------------------
+	// Font that can be applied to a control via mines::Control.
+	//------------------------------------------------------------------------------------
 	class Font : public BaseClass
 	{
 	public:
 		friend class Control;
 
-		Font(const std::wstring& path, std::int32_t size, HWND window);
+		Font(const std::wstring& path, std::int32_t size);
 		Font() = default;
 		~Font();
 
 	private:
-		Vector2<WORD> m_OriginalWindowSize = { 0 };
 		HFONT m_Handle = nullptr;
-		HWND m_WindowHandle = nullptr;
 		std::wstring m_Name;
-		std::int32_t m_Size, m_OriginalSize;
+		std::int32_t m_Size;
 	};
+
 }
 
 // The Kumor

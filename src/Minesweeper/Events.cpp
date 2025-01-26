@@ -49,9 +49,10 @@ namespace mines
 			if (it->Name == hook.Name)
 			{
 				it->Callback = hook.Callback;
-				break;
+				return;
 			}
 		}
+		AddHook(eventType, hook);
 	}
 
 	EventReceiver* EventSource::PinReceiver(EventReceiver* rec)

@@ -19,14 +19,13 @@ namespace mines
 		));
 	}
 
+	Control::Control()
+	{
+	}
+
 	Control::~Control()
 	{
 		DeleteObject(m_Handle);
-	}
-
-	HWND Control::GetHandle() const
-	{
-		return m_Handle;
 	}
 
 	void Control::SetPosition(const Vec2& position)
@@ -109,24 +108,32 @@ namespace mines
 	{
 		SendMessage(m_Handle, WM_SETFONT, reinterpret_cast<WPARAM>(font->m_Handle), TRUE);
 
+		// If there's a predefined font (usually is) unpin this control from it's events.
 		if (m_Font)
-			m_Font->m_EventSource.UnpinReceiver(&m_EventReceiver);
-
-		if (font)
-			font->m_EventSource.PinReceiver(&m_EventReceiver);
+			m_Font->GetEventSource().UnpinReceiver(&m_EventReceiver);
 
 		m_Font = font;
 
-		m_EventReceiver.ReplaceHook(EventType::Update, Hook("Control.FontUpdate", [this](const EventData& data)
+		font->GetEventSource().PinReceiver(&m_EventReceiver);
+
+		m_EventReceiver.ReplaceHook(EventType::Update, Hook("Control.UpdateFont", [&](const EventData& data)
 		{
 			HFONT fontHandle = std::any_cast<HFONT>(data.Value);
 			SendMessage(m_Handle, WM_SETFONT, reinterpret_cast<WPARAM>(fontHandle), TRUE);
+
+			// Force re-draw
+			RedrawWindow(m_Handle, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
 		}));
 	}
 
 	void Control::Close()
 	{
 		CloseWindow(m_Handle);
+	}
+
+	void Control::RegisterSize()
+	{
+
 	}
 
 	Text::Text(const std::wstring& text, const Vec2& size, const Vec2& position, Control* parent)

@@ -22,13 +22,8 @@ namespace mines
     }
 
     void Timer::s_TimerProc(HWND, UINT, UINT_PTR, DWORD)
-    {
-        PostQuitMessage(1);
-    }
-
-    std::uint64_t Timer::GetId() const
-    {
-        return m_Id;
+	{
+		PostQuitMessage(1);
     }
 
     void Timer::SetWindow(Window* window)

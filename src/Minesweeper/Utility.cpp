@@ -2,11 +2,9 @@
 
 namespace mines
 {
-	Font::Font(const std::wstring& name, std::int32_t size, HWND window)
-		: m_Name(name), m_WindowHandle(window), m_Size(size), m_OriginalSize(size)
+	Font::Font(const std::wstring& name, std::int32_t size)
+		: m_Name(name), m_Size(size)
 	{
-		m_OriginalWindowSize = GetWindowSize(window);
-
 		m_Handle = CreateFont(
 			size,
 			0,
@@ -27,19 +25,21 @@ namespace mines
 
 		m_EventReceiver.SetQualifier(reinterpret_cast<event_qualifier>(m_Handle));
 
-#ifdef MINES_CLASSES_EVENTACTIVE
-		m_EventReceiver.AddHook(EventType::Resize, Hook("Font.Resize", [this](const EventData& data)
+		m_EventReceiver.AddHook(EventType::Resize, Hook("Font.Resize", [&](const EventData& data)
 		{
-			Vector2<WORD> windowSize = std::any_cast<Vector2<WORD>>(data.Value);
+			DeleteObject(static_cast<HGDIOBJ>(m_Handle));
 
-			float newFontSize = (m_OriginalSize * windowSize.x) / m_OriginalWindowSize.x;
-			newFontSize = round(newFontSize);
-			m_Size = newFontSize;
+			WindowSize windowSize = std::any_cast<WindowSize>(data.Value);
+			WindowSize originalSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+			Vector2<float> fraction = {
+				static_cast<float>(windowSize.x) / originalSize.x,
+				static_cast<float>(windowSize.y) / originalSize.y
+			};
 
-			// Recreates the font.
-			DeleteObject(m_Handle);
-			m_Handle = CreateFont(
-				newFontSize,
+			std::int32_t newSize = m_Size * fraction.Y;
+
+			this->m_Handle = CreateFont(
+				newSize,
 				0,
 				0,
 				0,
@@ -56,9 +56,10 @@ namespace mines
 			);
 			CheckErrors("Font.m_Handle");
 
+			m_EventReceiver.SetQualifier(reinterpret_cast<event_qualifier>(m_Handle));
+
 			m_EventSource.CallEvent(EventType::Update, m_Handle);
 		}));
-#endif
 	}
 
 	Font::~Font()

@@ -1,16 +1,18 @@
-//****************************************************************
+//********************************************************************************************
 // File: Timers.h
 // Purpose: Has timers that trigger every x seconds.
 // 
 // Authors: The Kumor
-//****************************************************************
+//********************************************************************************************
 
 #pragma once
 
+// STL
 #include <cstdint>
 #include <functional>
 #include <windows.h>
 
+// Minesweeper
 #include <Minesweeper/BaseClass.h>
 #include <Minesweeper/Events.h>
 #include <Minesweeper/Errors.h>
@@ -19,9 +21,9 @@
 namespace mines
 {
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// Stuff that is passed to callback.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	struct TimerData
 	{
 		TimerData(const std::any& data);
@@ -33,9 +35,9 @@ namespace mines
 
 	static std::uint32_t s_LastTimerId;
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// Timer that runs a function n times and every x seconds.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	class Timer : public BaseClass
 	{
 	public:
@@ -47,8 +49,9 @@ namespace mines
 		// Is called when timer gets a tick.
 		static void CALLBACK s_TimerProc(HWND, UINT, UINT_PTR, DWORD);
 
-		std::uint64_t GetId() const;
+		inline std::uint64_t GetId() const { return m_Id; }
 
+		// Because of how WinAPI works, we need to provide a timer with some window.
 		void SetWindow(Window* window);
 
 		// Creates a WinAPI timer with member variables acting as config.

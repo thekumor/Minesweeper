@@ -15,8 +15,8 @@ namespace mines
 		using TextPtr = std::shared_ptr<Text>;
 		using ButtonPtr = std::shared_ptr<Button>;
 
-		Font defaultFont(L"Verdana", 16, wnd.m_Handle);
-		Font bigFont(L"Verdana", 36, wnd.m_Handle);
+		Font defaultFont(L"Verdana", 24);
+		Font bigFont(L"Verdana", 36);
 
 		ScenePtr minefieldScene = wnd.CreateScene("Mine field");
 		{

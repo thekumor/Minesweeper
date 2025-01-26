@@ -37,9 +37,11 @@ namespace mines
 
 	static void s_OnWindowResize(HWND handle, WPARAM wp, LPARAM lp)
 	{
+		//Vector2<WORD> size(LOWORD(lp), HIWORD(lp));
 		Vector2<WORD> size = Window::s_GetSize(handle);
 		g_EventSource.CallEvent(EventType::Resize, size);
 	}
+
 	LRESULT CALLBACK Window::s_Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp)
 	{
 		switch (msg)
@@ -71,14 +73,21 @@ namespace mines
 			case WM_EXITSIZEMOVE:
 			{
 				s_OnWindowResize(handle, wp, lp);
+				return 0;
 			} break;
 
 			case WM_SIZE:
 			{
+				// Side note: SIZE_RESTORED triggers when window is "unmaximized" but also during the resize (bad).
 				if (wp == SIZE_MAXIMIZED || wp == SIZE_MAXSHOW)
 				{
 					s_OnWindowResize(handle, wp, lp);
 				}
+			} break;
+
+			default:
+			{
+
 			} break;
 		}
 
@@ -121,14 +130,14 @@ namespace mines
 	{
 		RECT lpRect = { 0 };
 		GetWindowRect(handle, &lpRect);
-		CheckErrors("GetWindowRect");
+		std::int32_t errorCode = CheckErrors("GetWindowRect");
 		WORD width = lpRect.right - lpRect.left;
 		WORD height = lpRect.bottom - lpRect.top;
 
 		return Vector2<WORD>(width, height);
 	}
 
-	mines::Vector2<WORD> Window::s_GetSize()
+	mines::Vector2<WORD> Window::GetSize()
 	{
 		return Window::s_GetSize(m_Handle);
 	}
@@ -150,11 +159,6 @@ namespace mines
 	Scene::Scene(const std::string& name)
 		: m_Name(name)
 	{
-	}
-
-	const std::string& Scene::GetName() const
-	{
-		return m_Name;
 	}
 
 	void Scene::Clear()

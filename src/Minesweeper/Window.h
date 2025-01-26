@@ -1,20 +1,23 @@
-//****************************************************************
+//********************************************************************************************
 // File: Window.h
 // Purpose: Contains window and scene classes.
 // 
 // Authors: The Kumor
-//****************************************************************
+//********************************************************************************************
 
 #pragma once
 
+// STL
 #include <string>
 #include <any>
 #include <vector>
 #include <memory>
 #include <optional>
 
+// WinAPI
 #include <windows.h>
 
+// Minesweeper
 #include <Minesweeper/Global.h>
 #include <Minesweeper/BaseClass.h>
 #include <Minesweeper/Vectors.h>
@@ -25,9 +28,9 @@
 namespace mines
 {
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// A container for entities.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	class Scene : public BaseClass
 	{
 	public:
@@ -44,7 +47,7 @@ namespace mines
 			return ent;
 		}
 		
-		const std::string& GetName() const;
+		inline const std::string& GetName() const { return m_Name; }
 
 		// Every Control that this scene had is gone upon calling.
 		void Clear();
@@ -58,9 +61,9 @@ namespace mines
 		std::vector<std::shared_ptr<Control>> m_Entities;
 	};
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// A window that can contains scenes that can be swapped.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	class Window : public Control
 	{
 	public:
@@ -79,8 +82,9 @@ namespace mines
 		static bool s_DrawBitmap(HDC winDC, const std::wstring& path);
 
 		// Gets the window's size.
-		Vector2<WORD> s_GetSize();
+		Vector2<WORD> GetSize();
 
+		// Gets a scene by given name, otherwise returns nullptr.
 		std::shared_ptr<Scene> GetSceneByName(const std::string& name);
 
 		// Makes a new scene.

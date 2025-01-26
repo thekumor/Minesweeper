@@ -1,19 +1,21 @@
-//****************************************************************
+//********************************************************************************************
 // File: Application.h
-// Purpose: Stores mines::Application which is the main
-//			class of this project.
+// Purpose: Stores mines::Application which is the main class of this project.
 // 
 // Authors: The Kumor
-//****************************************************************
+//********************************************************************************************
 
 #pragma once
 
+// STL
 #include <cstdint>
 #include <string>
 #include <algorithm>
 
+// WinAPI
 #include <windows.h>
 
+// Minesweeper
 #include <Minesweeper/BaseClass.h>
 #include <Minesweeper/Vectors.h>
 #include <Minesweeper/Window.h>
@@ -24,10 +26,9 @@
 namespace mines
 {
 
-	//----------------------------------------------------------
-	// Class that acts as an instance of the application.
-	// Contains a window.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
+	// Class that acts as an instance of the application. Contains a window.
+	//------------------------------------------------------------------------------------
 	class Application : public BaseClass
 	{
 	public:
@@ -41,9 +42,9 @@ namespace mines
 		Window m_Window;
 	};
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// Player's entry to the leader board. Has his name and score.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	class LeaderboardEntry : public BaseClass
 	{
 	public:
@@ -76,10 +77,9 @@ namespace mines
 		std::int32_t m_Score = -1;
 	};
 
-	//----------------------------------------------------------
-	// Leader board that sorts players and has capability
-	// of displaying itself.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
+	// Leader board that sorts players and has capability of displaying itself.
+	//------------------------------------------------------------------------------------
 	class Leaderboard : public BaseClass
 	{
 	public:

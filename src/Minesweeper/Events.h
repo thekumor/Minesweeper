@@ -1,12 +1,13 @@
-//****************************************************************
+//********************************************************************************************
 // File: Events.h
 // Purpose: Stores the entire event system (hooks, callbacks, etc).
 // 
 // Authors: The Kumor
-//****************************************************************
+//********************************************************************************************
 
 #pragma once
 
+// STL
 #include <string>
 #include <vector>
 #include <any>
@@ -14,6 +15,7 @@
 #include <cstdint>
 #include <unordered_map>
 
+// WinAPI
 #include <windows.h>
 
 #define MINES_NODATA nullptr
@@ -30,15 +32,12 @@ namespace mines
 
 	enum class EventType : std::int32_t
 	{
-		Invalid = 0,
-		Tick, Update, PreDraw, PostDraw,
-		Timer, Command, Close, Resize,
-		Destroy
+		Invalid = 0, Tick, Update, PreDraw, PostDraw, Timer, Command, Close, Resize, Destroy
 	};
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// Contains a single std::any variable.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	struct EventData
 	{
 		EventData(const std::any& val);
@@ -50,9 +49,9 @@ namespace mines
 
 	using EventCallback = std::function<void(const EventData& data)>;
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// A structure that describes a callback for an event.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	struct Hook
 	{
 		Hook(const std::string& name, const EventCallback& callback);
@@ -65,9 +64,9 @@ namespace mines
 		EventCallback Callback = nullptr;
 	};
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// Contains hooks that are run once event is fired.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	struct Event
 	{
 		Event(EventType type);
@@ -75,24 +74,23 @@ namespace mines
 
 		EventType Type = EventType::Invalid;
 
-		// All the hooks (and ultimately, functions) that are literally
-		// 'hooked' to this event. Meaning they're called upon event is
-		// run.
+		// All the hooks (and ultimately, functions) that are literally 'hooked' to this event. Meaning they're called
+		// upon event is run.
 		std::vector<Hook> Hooks;
 	};
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// Base class for event-related classes.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	class EventBase
 	{
 	public:
 		EventBase() = default;
 	};
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// This class runs callbacks when the event source tells it to.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	class EventReceiver : public EventBase
 	{
 	public:
@@ -112,8 +110,7 @@ namespace mines
 		// Replaces a hook under given event that has a specified name.
 		void ReplaceHook(EventType eventType, const Hook& hook);
 
-		// Sets it's object handle to particular address. This is done
-		// because some events are only run on a particular receiver.
+		// Sets it's object handle to particular address. This is done because some events are only run on a particular receiver.
 		// Example of it's use would be a button click.
 		void SetQualifier(event_qualifier qualifier);
 
@@ -122,23 +119,21 @@ namespace mines
 		std::unordered_map<EventType, Event> m_Events;
 	};
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// Tells all the receivers inside it to run callbacks.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	class EventSource : public EventBase
 	{
 	public:
 		EventSource() = default;
 
-		// Adds a receiver to this source and returns it as a pointer
-		// from within vector of receivers.
+		// Adds a receiver to this source and returns it as a pointer from within vector of receivers.
 		EventReceiver* PinReceiver(EventReceiver* rec);
 
 		// Runs a particular event on all of it's receivers.
-		void CallEvent(EventType type, const std::any& eventData);
+		void CallEvent(EventType type, const std::any& eventData = MINES_NODATA);
 
-		// Runs a particular event on particular receivers (usually one).
-		// Example of it's use would be a button click.
+		// Runs a particular event on particular receivers (usually one). Example of it's use would be a button click.
 		void CallEvent(EventType type, event_qualifier qualifier, const std::any& eventData);
 
 		// Detaches given receiver.
@@ -148,18 +143,18 @@ namespace mines
 		std::vector<EventReceiver*> m_Receivers;
 	};
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// Class for others that need a source-receiver system.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	class EventManager : public EventReceiver, public EventSource
 	{
 	public:
 		EventManager() = default;
 	};
 
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	// Class for others that need a source-receiver system.
-	//----------------------------------------------------------
+	//------------------------------------------------------------------------------------
 	class EventActive : public EventBase
 	{
 	public:
