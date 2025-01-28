@@ -1,6 +1,7 @@
 .vs/
 CMakeFiles/
 Debug/
+Release/
 Minesweeper.dir/
 x64/
 *.sln

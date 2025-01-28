@@ -15,8 +15,8 @@ namespace mines
 		using TextPtr = std::shared_ptr<Text>;
 		using ButtonPtr = std::shared_ptr<Button>;
 
-		Font defaultFont(L"Verdana", 24);
-		Font bigFont(L"Verdana", 36);
+		Font defaultFont(L"Segoe UI", 24);
+		Font bigFont(L"Segoe UI", 36);
 
 		ScenePtr minefieldScene = wnd.CreateScene("Mine field");
 		{
@@ -30,12 +30,32 @@ namespace mines
 			);
 			flagsLeft->SetFont(&bigFont);
 
+			ButtonPtr newGame = minefieldScene->CreateControl<Button>(
+				L"New Game", Vec2(170, 48), Vec2(1200, 200), &wnd
+			);
+			newGame->SetFont(&bigFont);
+
+			ButtonPtr loadGame = minefieldScene->CreateControl<Button>(
+				L"Load Game", Vec2(170, 48), Vec2(1200, 260), &wnd
+			);
+			loadGame->SetFont(&bigFont);
+
+			ButtonPtr saveGame = minefieldScene->CreateControl<Button>(
+				L"Save Game", Vec2(170, 48), Vec2(1200, 320), &wnd
+			);
+			saveGame->SetFont(&bigFont);
+
+			ButtonPtr myLeaderboard = minefieldScene->CreateControl<Button>(
+				L"Leaderboard", Vec2(170, 48), Vec2(1200, 380), &wnd
+			);
+			myLeaderboard->SetFont(&bigFont);
+
 			for (std::int32_t y = 0; y < 12; y++)
 			{
 				for (std::int32_t x = 0; x < 28; x++)
 				{
 					ButtonPtr field = minefieldScene->CreateControl<Button>(
-						L"x", Vec2(40, 40), Vec2(40 + x * 40, 200 + y * 40), &wnd
+						L"", Vec2(40, 40), Vec2(40 + x * 40, 200 + y * 40), &wnd
 					);
 					field->SetFont(&defaultFont);
 				}
