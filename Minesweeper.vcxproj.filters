@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Dev\Minesweeper\src\Minesweeper\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Dev\Minesweeper\src\Minesweeper\Minesweeper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Dev\Minesweeper\src\Minesweeper\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Minesweeper\Error.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Dev\Minesweeper\src\Minesweeper\Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Dev\Minesweeper\src\Minesweeper\Implementation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Dev\Minesweeper\src\Minesweeper\Vectors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Dev\Minesweeper\src\Minesweeper\Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Minesweeper\Error.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Dev\Minesweeper\build\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6D4B4B75-63CE-3A94-A43C-8657DB91C7E3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{78C37B53-D33F-3F07-A7E7-1BED0BA6C625}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
