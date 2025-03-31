@@ -1,0 +1,11 @@
+.vs/
+Debug/
+CMakeFiles/
+Minesweeper.dir/
+x64/
+*.sln
+*.vcxproj
+*.filters
+*.txt
+*.cmake
+*.user

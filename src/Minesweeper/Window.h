@@ -9,11 +9,12 @@
 // Minesweeper
 #include <Minesweeper/Vectors.h>
 #include <Minesweeper/Error.h>
+#include <Minesweeper/Controls.h>
 
 namespace mwr
 {
 
-	class Window
+	class Window : public Control
 	{
 	public:
 		Window(HINSTANCE instance, const Vec2i& size, const std::wstring& title);
@@ -24,11 +25,8 @@ namespace mwr
 		static const std::wstring ClassName;
 
 	private:
-		Vec2i m_Size;
-		std::wstring m_Title;
 		HINSTANCE m_Instance;
 		WNDCLASSEXW m_Class;
-		HWND m_Handle;
 	};
 
 }

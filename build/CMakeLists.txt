@@ -21,4 +21,4 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
 	$<INSTALL_INTERFACE:src>
 )
 
-target_link_libraries(${CMAKE_PROJECT_NAME} user32)
+target_link_libraries(${CMAKE_PROJECT_NAME} user32 gdi32)

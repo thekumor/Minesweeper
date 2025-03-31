@@ -5,6 +5,6 @@
 namespace mwr
 {
 
-	DWORD MsgIfError(const wchar_t* info);
+	DWORD MsgIfError(const char* info);
 
 }

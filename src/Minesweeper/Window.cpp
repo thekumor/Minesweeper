@@ -4,8 +4,9 @@ namespace mwr
 {
 
 	Window::Window(HINSTANCE instance, const Vec2i& size, const std::wstring& title)
-		: m_Size(size), m_Title(title), m_Instance(instance)
+		: Control(size, { CW_USEDEFAULT, CW_USEDEFAULT }, title)
 	{
+		m_Instance = instance;
 		m_Class = { 0 };
 
 		m_Class.lpszClassName = Window::ClassName.c_str();
@@ -16,7 +17,7 @@ namespace mwr
 		m_Class.lpfnWndProc = &Window::Procedure;
 
 		RegisterClassExW(&m_Class);
-		MsgIfError(L"Window.m_Class");
+		MsgIfError("Window.m_Class");
 
 		m_Handle = CreateWindowW(
 			Window::ClassName.c_str(),
@@ -31,7 +32,7 @@ namespace mwr
 			instance,
 			nullptr
 		);
-		MsgIfError(L"Window.m_Handle");
+		MsgIfError("Window.m_Handle");
 
 		ShowWindow(m_Handle, SW_SHOW);
 		UpdateWindow(m_Handle);
