@@ -1,3 +1,0 @@
-D:/Dev/Minesweeper/CMakeFiles/Minesweeper.dir
-D:/Dev/Minesweeper/CMakeFiles/ALL_BUILD.dir
-D:/Dev/Minesweeper/CMakeFiles/ZERO_CHECK.dir
