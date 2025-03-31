@@ -1,9 +1,0 @@
-﻿  1>Checking Build System
-  CMake is re-running because D:/Dev/Minesweeper/CMakeFiles/generate.stamp is out-of-date.
-    the file 'D:/Dev/Minesweeper/build/CMakeLists.txt'
-    is newer than 'D:/Dev/Minesweeper/CMakeFiles/generate.stamp.depend'
-    result='-1'
-  -- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.26100.
-  -- Configuring done (0.2s)
-  -- Generating done (0.1s)
-  -- Build files have been written to: D:/Dev/Minesweeper
