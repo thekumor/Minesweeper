@@ -7,9 +7,9 @@
 #include <windows.h>
 
 // Minesweeper
-#include <Minesweeper/Vectors.h>
-#include <Minesweeper/Error.h>
-#include <Minesweeper/Fonts.h>
+#include <minesweeper/vectors.h>
+#include <minesweeper/error.h>
+#include <minesweeper/fonts.h>
 
 namespace mwr
 {

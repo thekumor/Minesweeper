@@ -13,8 +13,8 @@
 #include <windows.h>
 
 // Minesweeper
-#include <Minesweeper/Application.h>
-#include <Minesweeper/Implementation.h>
+#include <minesweeper/application.h>
+#include <minesweeper/implementation.h>
 
 #pragma warning(suppress:28251)
 int APIENTRY wWinMain(HINSTANCE instance, HINSTANCE previousInstance, LPWSTR cmdLine, int cmdShow)

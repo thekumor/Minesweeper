@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "application.h"
 
 namespace mwr
 {
@@ -16,8 +16,8 @@ namespace mwr
 
 	int Application::Run()
 	{
-		Font arial(L"Cascadia Code", 24, FontStyle::StrikeOut | FontStyle::Underline);
-		Button* hello = CreateControl<Button>({ 100, 30 }, {0, 0}, L"Hello!", nullptr, &arial);
+		Font arial(L"Cascadia Code", 24);
+		Button* hello = CreateControl<Button>({ 100, 30 }, MWR_VEC0 + Vec2i(50, 0), L"Hello!", nullptr, &arial);
 
 		MSG msg;
 		while (GetMessageW(&msg, nullptr, 0, 0))

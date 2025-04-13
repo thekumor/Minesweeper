@@ -7,9 +7,10 @@
 #include <windows.h>
 
 // Minesweeper
-#include <Minesweeper/Vectors.h>
-#include <Minesweeper/Error.h>
-#include <Minesweeper/Controls.h>
+#include <minesweeper/vectors.h>
+#include <minesweeper/error.h>
+#include <minesweeper/controls.h>
+#include <../resource.h>
 
 namespace mwr
 {
@@ -17,6 +18,8 @@ namespace mwr
 	class Window : public Control
 	{
 	public:
+		friend class Application;
+
 		Window(HINSTANCE instance, const Vec2i& size, const std::wstring& title);
 		Window() = default;
 

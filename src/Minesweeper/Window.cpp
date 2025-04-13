@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "window.h"
 
 namespace mwr
 {
@@ -13,7 +13,9 @@ namespace mwr
 		m_Class.hInstance = instance;
 		m_Class.cbSize = sizeof(WNDCLASSEXW);
 		m_Class.lpszMenuName = nullptr;
-		m_Class.hCursor = LoadCursor(nullptr, IDC_ARROW);
+		m_Class.hCursor = LoadCursorW(nullptr, IDC_ARROW);
+		m_Class.hIcon = LoadIconW(instance, MAKEINTRESOURCEW(IDI_ICON1));
+		m_Class.hIconSm = LoadIconW(instance, MAKEINTRESOURCEW(IDI_ICON1));
 		m_Class.lpfnWndProc = &Window::Procedure;
 
 		RegisterClassExW(&m_Class);
@@ -49,7 +51,12 @@ namespace mwr
 
 			case WM_PAINT:
 			{
+				PAINTSTRUCT ps;
+				HDC hdc = BeginPaint(handle, &ps);
 
+				FillRect(hdc, &ps.rcPaint, reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1));
+
+				EndPaint(handle, &ps);
 			} break;
 		}
 

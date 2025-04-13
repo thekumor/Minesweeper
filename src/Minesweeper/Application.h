@@ -8,10 +8,11 @@
 #include <windows.h>
 
 // Minesweeper
-#include <Minesweeper/Window.h>
-#include <Minesweeper/Vectors.h>
-#include <Minesweeper/Controls.h>
-#include <Minesweeper/Fonts.h>
+#include <minesweeper/window.h>
+#include <minesweeper/vectors.h>
+#include <minesweeper/controls.h>
+#include <minesweeper/fonts.h>
+#include <minesweeper/utility.h>
 
 namespace mwr
 {

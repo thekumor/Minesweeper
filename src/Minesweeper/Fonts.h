@@ -8,7 +8,7 @@
 #include <windows.h>
 
 // Minesweeper
-#include <Minesweeper/Error.h>
+#include <minesweeper/error.h>
 
 namespace mwr
 {

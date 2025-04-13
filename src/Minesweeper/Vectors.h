@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#define MWR_VEC0 mwr::Vec2i(0, 0)
+
 namespace mwr
 {
 
