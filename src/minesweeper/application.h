@@ -37,7 +37,7 @@ namespace mwr
 	private:
 		Window m_MainWindow;
 		HINSTANCE m_Instance;
-		std::vector<Scene*> m_Scenes;
+		std::list<Scene*> m_Scenes;
 		Scene* m_CurrentScene;
 	};
 
@@ -62,7 +62,7 @@ namespace mwr
 
 	private:
 		std::string m_Name;
-		std::list<Control*> m_Controls;
+		std::vector<Control*> m_Controls;
 	};
 
 }

@@ -62,7 +62,7 @@ namespace mwr
 		void CallEventQualifier(EventType type, void* qualifier, const std::any& data = MWR_NODATA);
 
 	private:
-		std::vector<EventListener*> m_Listeners;
+		std::list<EventListener*> m_Listeners;
 	};
 
 	class EventActive

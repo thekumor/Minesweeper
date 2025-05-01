@@ -54,7 +54,7 @@ namespace mwr
 		Specification* currentSpec = nullptr;
 
 		Scene* difficultyScene = CreateScene("Difficulty Scene");
-		//Scene* minefieldScene = CreateScene("Minefield Scene");
+		Scene* minefieldScene = CreateScene("Minefield Scene");
 
 		difficultyScene->GetListener().AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
 		{
@@ -68,25 +68,25 @@ namespace mwr
 			easy->GetListener().AddHook(EventType::Click, Hook("Easy.Click", [&](const std::any& param)
 			{
 				currentSpec = &easySpec;
-				//SwitchScene(minefieldScene);
+				SwitchScene(minefieldScene);
 			}));
 
 			normal->GetListener().AddHook(EventType::Click, Hook("Normal.Click", [&](const std::any& param)
 			{
 				currentSpec = &normalSpec;
-				//SwitchScene(minefieldScene);
+				SwitchScene(minefieldScene);
 			}));
 
 			hard->GetListener().AddHook(EventType::Click, Hook("Hard.Click", [&](const std::any& param)
 			{
 				currentSpec = &hardSpec;
-				//SwitchScene(minefieldScene);
+				SwitchScene(minefieldScene);
 			}));
 
 			hell->GetListener().AddHook(EventType::Click, Hook("Hell.Click", [&](const std::any& param)
 			{
 				currentSpec = &hellSpec;
-				//SwitchScene(minefieldScene);
+				SwitchScene(minefieldScene);
 			}));
 		}));
 
@@ -105,13 +105,11 @@ namespace mwr
 
 	Scene* Application::CreateScene(const std::string& name)
 	{
-		Scene* newScene = new Scene(name);
-		if (!newScene)
+		Scene*& ref = m_Scenes.emplace_back(new Scene(name));
+		if (!ref)
 			MsgIfError("Unable to create a scene.");
 
-		m_Scenes.push_back(newScene);
-
-		return newScene;
+		return ref;
 	}
 
 	void Application::OpenScene(Scene* scene)
@@ -135,8 +133,17 @@ namespace mwr
 	Scene::Scene(const std::string& name)
 		: m_Name(name)
 	{
-		g_Dispatcher.AddListener(&m_Listener);
 		m_Listener.SetQualifier(this);
+		g_Dispatcher.AddListener(&m_Listener);
+
+		m_Listener.AddHook(EventType::SceneClose, Hook("Scene.SceneClose", [&](const std::any& param)
+		{
+			for (auto& k : m_Controls)
+			{
+				delete k;
+			}
+			m_Controls.clear();
+		}));
 	}
 
 	Scene::~Scene()

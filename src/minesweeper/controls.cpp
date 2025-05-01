@@ -24,7 +24,7 @@ namespace mwr
 
 	Control::~Control()
 	{
-		DeleteObject(m_Handle);
+		DestroyWindow(m_Handle);
 	}
 
 	Control* Control::GetParent()
