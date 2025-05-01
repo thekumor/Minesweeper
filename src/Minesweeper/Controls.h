@@ -10,11 +10,13 @@
 #include <minesweeper/vectors.h>
 #include <minesweeper/error.h>
 #include <minesweeper/fonts.h>
+#include <minesweeper/events.h>
+#include <minesweeper/implementation.h>
 
 namespace mwr
 {
 
-	class Control
+	class Control : public EventActive
 	{
 	public:
 		friend class Label;
@@ -22,10 +24,14 @@ namespace mwr
 
 		Control(const Vec2i& size, const Vec2i& position, const std::wstring& string, Control* parent = nullptr, Font* font = nullptr);
 		Control() = default;
-		virtual ~Control() = default;
+		virtual ~Control();
 
-		void SetPosition(const Vec2i& position);
-		void SetSize(const Vec2i& size);
+		static Vec2i s_GetSize(HWND handle);
+
+		const std::vector<Control*>& GetChildren();
+		Control* GetParent();
+		void SetPosition(const Vec2i& position, bool isScreen = false);
+		void SetSize(const Vec2i& size, bool isScreen = false);
 		void SetString(const std::wstring& string);
 		void SetParent(Control* parent);
 		void SetFont(Font* font);
@@ -35,7 +41,9 @@ namespace mwr
 		Font* m_Font;
 		HWND m_Handle;
 		Vec2i m_Size, m_Position;
+		Vec2i m_ScreenSize, m_ScreenPosition;
 		std::wstring m_String;
+		std::vector<Control*> m_Children;
 	};
 
 	class Label : public Control

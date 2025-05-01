@@ -46,5 +46,24 @@ namespace mwr
 	};
 
 	typedef Vec2<std::int32_t> Vec2i;
+	typedef Vec2<std::uint32_t> Vec2u;
+
+}
+
+namespace std
+{
+
+	template <typename T>
+	struct hash<mwr::Vec2<T>>
+	{
+		size_t operator()(const mwr::Vec2<T>& t) const
+		{
+			std::hash<T> hasher;
+			size_t h1 = hasher(t.x);
+			size_t h2 = hasher(t.y);
+
+			return h1 ^ (h2 << 1);
+		}
+	};
 
 }

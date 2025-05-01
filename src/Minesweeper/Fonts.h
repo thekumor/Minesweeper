@@ -9,6 +9,7 @@
 
 // Minesweeper
 #include <minesweeper/error.h>
+#include <minesweeper/implementation.h>
 
 namespace mwr
 {
@@ -22,18 +23,21 @@ namespace mwr
 		StrikeOut = 8
 	};
 
-	class Font
+	class Font : public EventActive
 	{
 	public:
 		friend class Control;
 
 		Font(const std::wstring& name, std::int32_t size, std::uint32_t style = FontStyle::Normal);
 		Font() = default;
+		~Font();
+
+		void SetSize(std::int32_t size, bool isScreen = false);
 
 	private:
 		HFONT m_Handle;
 		std::uint32_t m_Style;
-		std::int32_t m_Size;
+		std::int32_t m_Size, m_ScreenSize;
 		std::wstring m_Name;
 	};
 

@@ -8,6 +8,7 @@
 
 // STL
 #include <cstdlib>
+#include <unordered_map>
 
 // WinAPI
 #include <windows.h>
@@ -15,6 +16,11 @@
 // Minesweeper
 #include <minesweeper/application.h>
 #include <minesweeper/implementation.h>
+#include <minesweeper/vectors.h>
+
+// Globals
+mwr::EventDispatcher mwr::g_Dispatcher;
+std::unordered_map<HWND, mwr::Vec2i> mwr::g_WindowSizes;
 
 #pragma warning(suppress:28251)
 int APIENTRY wWinMain(HINSTANCE instance, HINSTANCE previousInstance, LPWSTR cmdLine, int cmdShow)

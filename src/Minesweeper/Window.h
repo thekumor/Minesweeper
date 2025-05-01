@@ -2,6 +2,7 @@
 
 // STL
 #include <string>
+#include <tuple>
 
 // WinAPI
 #include <windows.h>
@@ -10,6 +11,7 @@
 #include <minesweeper/vectors.h>
 #include <minesweeper/error.h>
 #include <minesweeper/controls.h>
+#include <minesweeper/implementation.h>
 #include <../resource.h>
 
 namespace mwr
@@ -25,7 +27,7 @@ namespace mwr
 
 		static LRESULT CALLBACK Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp);
 
-		static const std::wstring ClassName;
+		static const std::wstring s_ClassName;
 
 	private:
 		HINSTANCE m_Instance;

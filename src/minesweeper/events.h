@@ -5,12 +5,27 @@
 #include <functional>
 #include <unordered_map>
 #include <vector>
+#include <any>
 #include <memory>
+
+#define MWR_NODATA 0
 
 namespace mwr
 {
 
-	using EventCallback = std::function<void(void*)>;
+	enum EventType : std::uint32_t
+	{
+		Invalid = 0,
+		Think,
+		Resize,
+		Close,
+		StartUp,
+		Click,
+		SceneOpen,
+		SceneClose
+	};
+
+	using EventCallback = std::function<void(const std::any&)>;
 
 	struct Hook
 	{
@@ -21,22 +36,19 @@ namespace mwr
 		EventCallback Callback;
 	};
 
-	struct Event
-	{
-		Event(const std::string& name, const std::vector<Hook>& hooks = {});
-		Event() = default;
-
-		std::string Name;
-		std::vector<Hook> Hooks;
-	};
-
 	class EventListener
 	{
 	public:
 		EventListener() = default;
 
+		void* GetQualifier();
+		void OnCallEvent(EventType type, const std::any& data);
+		void AddHook(EventType eventType, const Hook& hook);
+		void SetQualifier(void* qualifier);
+
 	private:
-		std::unordered_map<Event, std::vector<Hook>> hooks;
+		std::unordered_map<EventType, std::vector<Hook>> m_Hooks;
+		void* m_Qualifier;
 	};
 
 	class EventDispatcher
@@ -44,11 +56,26 @@ namespace mwr
 	public:
 		EventDispatcher() = default;
 
-		void AddListener(std::shared_ptr<EventListener> listener);
-		void RemoveListener(std::shared_ptr<EventListener> listener);
+		void AddListener(EventListener* listener);
+		void RemoveListener(EventListener* listener);
+		void CallEvent(EventType type, const std::any& data = MWR_NODATA);
+		void CallEventQualifier(EventType type, void* qualifier, const std::any& data = MWR_NODATA);
 
 	private:
-		std::vector<std::shared_ptr<EventListener>> m_Listeners;
+		std::vector<EventListener*> m_Listeners;
+	};
+
+	class EventActive
+	{
+	public:
+		EventActive() = default;
+
+		EventDispatcher& GetDispatcher();
+		EventListener& GetListener();
+
+	protected:
+		EventDispatcher m_Dispatcher;
+		EventListener m_Listener;
 	};
 
 }
