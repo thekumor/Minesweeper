@@ -22,3 +22,4 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} user32 gdi32)
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE "src/Minesweeper/Resource.rc")

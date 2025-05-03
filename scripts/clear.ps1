@@ -2,6 +2,7 @@ $Files = @{
     'scripts' = $true
     'src' = $true
     'build' = $true
+    'images' = $true
     '.git' = $true
     
     '.gitignore' = $true
