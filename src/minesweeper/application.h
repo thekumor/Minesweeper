@@ -37,11 +37,11 @@ namespace mwr
 	private:
 		Window m_MainWindow;
 		HINSTANCE m_Instance;
-		std::list<Scene*> m_Scenes;
+		std::vector<Scene*> m_Scenes;
 		Scene* m_CurrentScene;
 	};
 
-	class Scene : public EventActive
+	class Scene : public BaseClass
 	{
 	public:
 		Scene(const std::string& name);
@@ -54,8 +54,6 @@ namespace mwr
 			T* object = new T(size, position, string, parent, font);
 			Control* control = dynamic_cast<Control*>(object);
 			m_Controls.emplace_back(control);
-
-			g_Dispatcher.AddListener(&control->GetListener());
 
 			return object;
 		}

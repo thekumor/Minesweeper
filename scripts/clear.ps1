@@ -4,6 +4,7 @@ $Files = @{
     'build' = $true
     '.git' = $true
     
+    '.gitignore' = $true
     'LICENSE' = $true
     'README.md' = $true
     'build.bat' = $true

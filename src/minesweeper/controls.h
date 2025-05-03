@@ -12,11 +12,12 @@
 #include <minesweeper/fonts.h>
 #include <minesweeper/events.h>
 #include <minesweeper/implementation.h>
+#include <minesweeper/base_class.h>
 
 namespace mwr
 {
 
-	class Control : public EventActive
+	class Control : public BaseClass
 	{
 	public:
 		friend class Label;

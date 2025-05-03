@@ -12,7 +12,7 @@
 #include <minesweeper/error.h>
 #include <minesweeper/controls.h>
 #include <minesweeper/implementation.h>
-#include <../resource.h>
+#include <minesweeper/resource.h>
 
 namespace mwr
 {
