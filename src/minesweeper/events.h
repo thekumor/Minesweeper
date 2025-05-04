@@ -8,6 +8,9 @@
 #include <any>
 #include <memory>
 
+// Minesweeper
+#include <minesweeper/utility.h>
+
 #define MWR_NODATA 0
 
 namespace mwr
@@ -40,6 +43,7 @@ namespace mwr
 	{
 	public:
 		EventListener() = default;
+		~EventListener();
 
 		void* GetQualifier();
 		void OnCallEvent(EventType type, const std::any& data);
@@ -57,12 +61,16 @@ namespace mwr
 		EventDispatcher() = default;
 
 		void AddListener(EventListener* listener);
+		void AddListenerForce(EventListener* listener);
 		void RemoveListener(EventListener* listener);
 		void CallEvent(EventType type, const std::any& data = MWR_NODATA);
 		void CallEventQualifier(EventType type, void* qualifier, const std::any& data = MWR_NODATA);
+		void RemoveInvalidListeners();
+		void AddValidListeners();
 
 	private:
-		std::list<EventListener*> m_Listeners;
+		std::vector<Handle<EventListener>> m_Listeners;
+		std::vector<Handle<EventListener>> m_WaitingListeners;
 	};
 
 	class EventActive

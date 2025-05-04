@@ -98,6 +98,9 @@ namespace mwr
 		{
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
+			
+			g_Dispatcher.RemoveInvalidListeners();
+			g_Dispatcher.AddValidListeners();
 		}
 
 		return EXIT_SUCCESS;
@@ -134,7 +137,7 @@ namespace mwr
 		: m_Name(name)
 	{
 		m_Listener.SetQualifier(this);
-		g_Dispatcher.AddListener(&m_Listener);
+		g_Dispatcher.AddListenerForce(&m_Listener);
 
 		m_Listener.AddHook(EventType::SceneClose, Hook("Scene.SceneClose", [&](const std::any& param)
 		{

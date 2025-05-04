@@ -8,18 +8,30 @@ namespace mwr
 		m_ScreenSize(size), m_ScreenPosition(position)
 	{
 		if (parent)
+		{
 			parent->m_Children.push_back(this);
 
-		m_Listener.AddHook(EventType::Resize, Hook("Control.DefaultResize", [&](const std::any& param)
-		{
-			Vec2<float> fraction = std::any_cast<Vec2<float>>(param);
+			m_Listener.AddHook(EventType::Resize, Hook("Control.DefaultResize", [&](const std::any& param)
+			{
+				Vec2<float> fraction = std::any_cast<Vec2<float>>(param);
 
-			Vec2i newControlSize(m_Size.x * fraction.x, m_Size.y * fraction.y);
-			Vec2i newControlPos(m_Position.x * fraction.x, m_Position.y * fraction.y);
+				Vec2i newControlSize(m_Size.x * fraction.x, m_Size.y * fraction.y);
+				Vec2i newControlPos(m_Position.x * fraction.x, m_Position.y * fraction.y);
 
-			SetPosition(newControlPos, true);
-			SetSize(newControlSize, true);
-		}));
+				SetPosition(newControlPos, true);
+				SetSize(newControlSize, true);
+			}));
+		}
+	}
+
+	Control::Control(const Control&& other)
+		: Control(other.m_Size, other.m_Position, other.m_String, other.m_Parent, other.m_Font)
+	{
+	}
+
+	Control::Control()
+	{
+
 	}
 
 	Control::~Control()

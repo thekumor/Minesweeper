@@ -24,7 +24,8 @@ namespace mwr
 		friend class Button;
 
 		Control(const Vec2i& size, const Vec2i& position, const std::wstring& string, Control* parent = nullptr, Font* font = nullptr);
-		Control() = default;
+		Control(const Control&& other);
+		Control();
 		virtual ~Control();
 
 		static Vec2i s_GetSize(HWND handle);

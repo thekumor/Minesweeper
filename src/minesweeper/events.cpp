@@ -8,6 +8,11 @@ namespace mwr
 	{
 	}
 
+	EventListener::~EventListener()
+	{
+
+	}
+
 	void* EventListener::GetQualifier()
 	{
 		return m_Qualifier;
@@ -15,27 +20,53 @@ namespace mwr
 
 	void EventDispatcher::AddListener(EventListener* listener)
 	{
-		m_Listeners.push_back(listener);
+		m_WaitingListeners.push_back(Handle<EventListener>(listener));
+	}
+
+	void EventDispatcher::AddListenerForce(EventListener* listener)
+	{
+		m_Listeners.push_back(Handle<EventListener>(listener));
 	}
 
 	void EventDispatcher::RemoveListener(EventListener* listener)
 	{
-		std::erase(m_Listeners, listener);
+		for (auto& k : m_Listeners)
+			k.SetValid(false);
 	}
 
 	void EventDispatcher::CallEvent(EventType type, const std::any& data)
 	{
 		for (auto& k : m_Listeners)
-			k->OnCallEvent(type, data);
+			(*k)->OnCallEvent(type, data);
 	}
 
 	void EventDispatcher::CallEventQualifier(EventType type, void* qualifier, const std::any& data)
 	{
 		for (auto& k : m_Listeners)
 		{
-			if (k->GetQualifier() == qualifier)
-				k->OnCallEvent(type, data);
+			if ((*k)->GetQualifier() == qualifier)
+				(*k)->OnCallEvent(type, data);
 		}
+	}
+
+	void EventDispatcher::RemoveInvalidListeners()
+	{
+		for (std::int32_t i = 0; i < m_Listeners.size(); i++)
+		{
+			if (!m_Listeners[i].IsValid())
+			{
+				m_Listeners.erase(m_Listeners.begin() + i);
+				i--;
+			}
+		}
+	}
+
+	void EventDispatcher::AddValidListeners()
+	{
+		for (auto& k : m_WaitingListeners)
+			m_Listeners.push_back(k);
+
+		m_WaitingListeners.clear();
 	}
 
 	void EventListener::OnCallEvent(EventType type, const std::any& data)
