@@ -3,9 +3,12 @@
 namespace mwr
 {
 
-	BaseClass::BaseClass()
+	BaseClass::BaseClass(bool forceListener)
 	{
-		g_Dispatcher.AddListener(&m_Listener);
+		if (forceListener)
+			g_Dispatcher.AddListenerForce(&m_Listener);
+		else
+			g_Dispatcher.AddListener(&m_Listener);
 	}
 
 	BaseClass::~BaseClass()

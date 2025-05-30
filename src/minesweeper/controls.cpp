@@ -44,6 +44,11 @@ namespace mwr
 		return m_Parent;
 	}
 
+	const std::string& Control::GetTag() const
+	{
+		return m_Tag;
+	}
+
 	Vec2i Control::s_GetSize(HWND handle)
 	{
 		RECT rect;
@@ -72,13 +77,21 @@ namespace mwr
 		if (isScreen)
 			m_ScreenSize = size;
 		else
+		{
 			m_Size = size;
+			g_WindowSizes[m_Handle] = size;
+		}
 	}
 
 	void Control::SetString(const std::wstring& string)
 	{
 		SetWindowTextW(m_Handle, string.c_str());
 		m_String = string;
+	}
+
+	void Control::SetTag(const std::string& tag)
+	{
+		m_Tag = tag;
 	}
 
 	void Control::SetParent(Control* parent)

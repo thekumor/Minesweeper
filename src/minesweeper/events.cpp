@@ -3,6 +3,7 @@
 namespace mwr
 {
 
+#if MWR_COMPLEX_EVENT_SYSTEM
 	Hook::Hook(const std::string& name, EventCallback callback)
 		: Name(name), Callback(callback)
 	{
@@ -10,7 +11,6 @@ namespace mwr
 
 	EventListener::~EventListener()
 	{
-
 	}
 
 	void* EventListener::GetQualifier()
@@ -31,21 +31,40 @@ namespace mwr
 	void EventDispatcher::RemoveListener(EventListener* listener)
 	{
 		for (auto& k : m_Listeners)
-			k.SetValid(false);
+		{
+			if ((*k) == listener)
+			{
+				k.SetValid(false);
+				break;
+			}
+		}
+
+		for (auto& k : m_WaitingListeners)
+		{
+			if ((*k) == listener)
+			{
+				k.SetValid(false);
+				break;
+			}
+		}
 	}
 
 	void EventDispatcher::CallEvent(EventType type, const std::any& data)
 	{
 		for (auto& k : m_Listeners)
-			(*k)->OnCallEvent(type, data);
+		{
+			if (k.IsValid())
+				(*k)->OnCallEvent(type, data);
+		}
 	}
 
 	void EventDispatcher::CallEventQualifier(EventType type, void* qualifier, const std::any& data)
 	{
 		for (auto& k : m_Listeners)
 		{
-			if ((*k)->GetQualifier() == qualifier)
-				(*k)->OnCallEvent(type, data);
+			if (k.IsValid())
+				if ((*k)->GetQualifier() == qualifier)
+					(*k)->OnCallEvent(type, data);
 		}
 	}
 
@@ -56,6 +75,15 @@ namespace mwr
 			if (!m_Listeners[i].IsValid())
 			{
 				m_Listeners.erase(m_Listeners.begin() + i);
+				i--;
+			}
+		}
+
+		for (std::int32_t i = 0; i < m_WaitingListeners.size(); i++)
+		{
+			if (!m_WaitingListeners[i].IsValid())
+			{
+				m_WaitingListeners.erase(m_WaitingListeners.begin() + i);
 				i--;
 			}
 		}
@@ -83,6 +111,21 @@ namespace mwr
 		m_Hooks[eventType].push_back(hook);
 	}
 
+	void EventListener::RemoveHook(EventType eventType, const std::string& name)
+	{
+		auto it = m_Hooks.find(eventType);
+
+		if (it == m_Hooks.end())
+			return;
+
+		for (std::vector<Hook>::iterator it = m_Hooks[eventType].begin(); it != m_Hooks[eventType].end(); it++)
+			if (it->Name == name)
+			{
+				m_Hooks[eventType].erase(it);
+				return;
+			}
+	}
+
 	void EventListener::SetQualifier(void* qualifier)
 	{
 		m_Qualifier = qualifier;
@@ -97,5 +140,17 @@ namespace mwr
 	{
 		return m_Listener;
 	}
+
+	void EventActive::AddHook(EventType eventType, const Hook& hook)
+	{
+		m_Listener.AddHook(eventType, hook);
+	}
+
+	void EventActive::RemoveHook(EventType eventType, const std::string& name)
+	{
+		m_Listener.RemoveHook(eventType, name);
+	}
+
+#endif
 
 }

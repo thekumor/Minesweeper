@@ -12,10 +12,12 @@
 #include <minesweeper/utility.h>
 
 #define MWR_NODATA 0
+#define MWR_COMPLEX_EVENT_SYSTEM 1
 
 namespace mwr
 {
 
+#if MWR_COMPLEX_EVENT_SYSTEM
 	enum EventType : std::uint32_t
 	{
 		Invalid = 0,
@@ -25,7 +27,8 @@ namespace mwr
 		StartUp,
 		Click,
 		SceneOpen,
-		SceneClose
+		SceneClose,
+		TimerClock,
 	};
 
 	using EventCallback = std::function<void(const std::any&)>;
@@ -48,6 +51,7 @@ namespace mwr
 		void* GetQualifier();
 		void OnCallEvent(EventType type, const std::any& data);
 		void AddHook(EventType eventType, const Hook& hook);
+		void RemoveHook(EventType eventType, const std::string& name);
 		void SetQualifier(void* qualifier);
 
 	private:
@@ -81,9 +85,13 @@ namespace mwr
 		EventDispatcher& GetDispatcher();
 		EventListener& GetListener();
 
+		void AddHook(EventType eventType, const Hook& hook);
+		void RemoveHook(EventType eventType, const std::string& name);
+
 	protected:
 		EventDispatcher m_Dispatcher;
 		EventListener m_Listener;
 	};
 
+#endif
 }

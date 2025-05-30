@@ -32,9 +32,11 @@ namespace mwr
 
 		const std::vector<Control*>& GetChildren();
 		Control* GetParent();
+		const std::string& GetTag() const;
 		void SetPosition(const Vec2i& position, bool isScreen = false);
 		void SetSize(const Vec2i& size, bool isScreen = false);
 		void SetString(const std::wstring& string);
+		void SetTag(const std::string& tag);
 		void SetParent(Control* parent);
 		void SetFont(Font* font);
 
@@ -45,6 +47,7 @@ namespace mwr
 		Vec2i m_Size, m_Position;
 		Vec2i m_ScreenSize, m_ScreenPosition;
 		std::wstring m_String;
+		std::string m_Tag;
 		std::vector<Control*> m_Children;
 	};
 

@@ -13,7 +13,7 @@
 #include <minesweeper/vectors.h>
 #include <minesweeper/controls.h>
 #include <minesweeper/fonts.h>
-#include <minesweeper/utility.h>
+#include <minesweeper/timer.h>
 #include <minesweeper/events.h>
 
 namespace mwr
@@ -30,6 +30,8 @@ namespace mwr
 
 		int Run();
 		Scene* CreateScene(const std::string& name);
+		Timer* CreateTimer(std::int32_t delay);
+		void DestroyTimer(Timer* ptr);
 		void OpenScene(Scene* scene);
 		void CloseScene(Scene* scene);
 		void SwitchScene(Scene* scene);
@@ -38,6 +40,7 @@ namespace mwr
 		Window m_MainWindow;
 		HINSTANCE m_Instance;
 		std::vector<Scene*> m_Scenes;
+		std::vector<Timer*> m_Timers;
 		Scene* m_CurrentScene;
 	};
 
@@ -57,6 +60,8 @@ namespace mwr
 
 			return object;
 		}
+
+		Control* GetControlByTag(const std::string& tag);
 
 	private:
 		std::string m_Name;

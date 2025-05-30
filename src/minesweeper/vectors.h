@@ -10,10 +10,9 @@ namespace mwr
 	template <typename T>
 	struct Vec2
 	{
-		Vec2(T x, T y) :
-			X(x), Y(y)
-		{
-		}
+		Vec2(T x, T y) : X(x), Y(y) {}
+		Vec2(T val) : X(val), Y(val) {}
+		Vec2(const Vec2& other) : X(other.x), Y(other.y) {}
 		Vec2() = default;
 
 		union
@@ -27,19 +26,19 @@ namespace mwr
 			T Y;
 		};
 
-		[[nodiscard]] Vec2 operator+(const Vec2&& other) const noexcept
+		[[nodiscard]] Vec2 operator+(const Vec2& other) const noexcept
 		{
 			return Vec2(x + other.x, y + other.y);
 		}
-		[[nodiscard]] Vec2 operator-(const Vec2&& other) const noexcept
+		[[nodiscard]] Vec2 operator-(const Vec2& other) const noexcept
 		{
 			return Vec2(x - other.x, y - other.y);
 		}
-		[[nodiscard]] Vec2 operator*(const Vec2&& other) const noexcept
+		[[nodiscard]] Vec2 operator*(const Vec2& other) const noexcept
 		{
 			return Vec2(x * other.x, y * other.y);
 		}
-		[[nodiscard]] Vec2 operator/(const Vec2&& other) const noexcept
+		[[nodiscard]] Vec2 operator/(const Vec2& other) const noexcept
 		{
 			return Vec2(x / other.x, y / other.y);
 		}

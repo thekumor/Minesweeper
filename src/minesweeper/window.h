@@ -26,8 +26,11 @@ namespace mwr
 		Window() = default;
 
 		static LRESULT CALLBACK Procedure(HWND handle, UINT msg, WPARAM wp, LPARAM lp);
-
+		static Vec2i GetRealSizeDifference(HWND handle);
 		static const std::wstring s_ClassName;
+
+		Vec2i GetRealSizeDifference() const;
+		void SetSize(const Vec2i& size, bool isScreen = false);
 
 	private:
 		HINSTANCE m_Instance;

@@ -9,7 +9,7 @@ namespace mwr
 	class BaseClass : public EventActive
 	{
 	public:
-		BaseClass();
+		BaseClass(bool forceListener = false);
 		~BaseClass();
 	};
 
