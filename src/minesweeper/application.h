@@ -5,9 +5,7 @@
 #include <list>
 #include <vector>
 #include <cstdlib>
-#ifdef _DEBUG
-#include <unordered_map>
-#endif
+#include <cmath>
 
 // WinAPI
 #include <windows.h>

@@ -76,6 +76,57 @@ namespace mwr
 		field->SetTag(newTag);
 	}
 
+	static struct FieldNeighbours
+	{
+		std::int32_t up, down, left, right, leftUp, leftDown, rightUp, rightDown;
+	};
+
+	static FieldNeighbours GetNeighbours(const std::vector<Button*>& fields, const Vec2i& minefieldSize, std::int32_t id)
+	{
+		const std::int32_t minefieldCount = fields.size();
+
+		std::int32_t up = (id >= minefieldSize.x) ? (id - minefieldSize.x) : (-1);
+		std::int32_t down = (id < minefieldCount - minefieldSize.x) ? (id + minefieldSize.x) : (-1);
+		std::int32_t left = (id % minefieldSize.x != 0) ? (id - 1) : (-1);
+		std::int32_t right = ((id + 1) % minefieldSize.x != 0) ? (id + 1) : (-1);
+		std::int32_t leftUp = (left != -1 && up != -1) ? (id - minefieldSize.x - 1) : (-1);
+		std::int32_t leftDown = (left != -1 && down != -1) ? (id + minefieldSize.x - 1) : (-1);
+		std::int32_t rightUp = (right != -1 && up != -1) ? (id - minefieldSize.x + 1) : (-1);
+		std::int32_t rightDown = (right != -1 && down != -1) ? (id + minefieldSize.x + 1) : (-1);
+
+		FieldNeighbours neighbours;
+		neighbours.up = up;
+		neighbours.down = down;
+		neighbours.left = left;
+		neighbours.right = right;
+		neighbours.leftUp = leftUp;
+		neighbours.leftDown = leftDown;
+		neighbours.rightUp = rightUp;
+		neighbours.rightDown = rightDown;
+
+		return neighbours;
+	}
+
+	static std::vector<Button*> GetFieldsWithinRadius(const std::vector<Button*>& fields, const Vec2i& minefieldSize, std::int32_t o, std::int32_t radius)
+	{
+		std::vector<Button*> buttons;
+		std::int32_t xO = o % minefieldSize.x;
+		std::int32_t yO = o / minefieldSize.x;
+
+		for (std::int32_t i = 0; i < fields.size(); i++)
+		{
+			std::int32_t x = i % minefieldSize.x;
+			std::int32_t y = i / minefieldSize.x;
+
+			float distance = sqrt(pow(xO - x, 2) + pow(yO - y, 2));
+
+			if (distance <= radius)
+				buttons.push_back(fields[i]);
+		}
+
+		return buttons;
+	}
+
 	int Application::Run()
 	{
 		Window& window = m_MainWindow;
@@ -88,7 +139,7 @@ namespace mwr
 		struct Specification
 		{
 			Vec2i minefieldSize;
-			std::int32_t time, totalBombs, totalFlags;
+			std::int32_t time, totalBombs, totalFlags, sweepForce;
 		};
 
 		Specification easySpec;
@@ -96,24 +147,28 @@ namespace mwr
 		easySpec.time = 5 * 60;
 		easySpec.totalBombs = 3;
 		easySpec.totalFlags = 10;
+		easySpec.sweepForce = 4;
 
 		Specification normalSpec;
 		normalSpec.minefieldSize = { 15, 15 };
 		normalSpec.time = 4 * 60;
 		normalSpec.totalBombs = 12;
 		normalSpec.totalFlags = 8;
+		easySpec.sweepForce = 7;
 
 		Specification hardSpec;
 		hardSpec.minefieldSize = { 20, 20 };
 		hardSpec.time = 3 * 60;
 		hardSpec.totalBombs = 28;
 		hardSpec.totalFlags = 6;
+		easySpec.sweepForce = 6;
 
 		Specification hellSpec;
 		hellSpec.minefieldSize = { 35, 25 };
 		hellSpec.time = 2 * 60;
 		hellSpec.totalBombs = 64;
 		hellSpec.totalFlags = 4;
+		easySpec.sweepForce = 5;
 
 		Specification* currentSpec = nullptr;
 
@@ -224,7 +279,8 @@ namespace mwr
 				Button* field = minefieldScene->CreateControl<Button>(
 					fieldSize,
 					Vec2i(margin.x + x * fieldSize.x, margin.y + y * fieldSize.y),
-					(containsBomb) ? L"M" : L"",
+					 (containsBomb) ? L"M" : L"",
+					//L"",
 					&window,
 					(containsBomb) ? &wingdings : &cascadia
 				);
@@ -236,18 +292,24 @@ namespace mwr
 
 				field->AddHook(EventType::Click, Hook("field.Click", [=](const std::any& param)
 				{
-					if (!FieldHasBomb(field)) return;
-
-					back->RemoveHook(EventType::Click, "back.Click");
-					leaderboard->RemoveHook(EventType::Click, "leaderboard.Click");
-					DestroyTimer(roundClock);
-
-					Timer* delay = CreateTimer(5000);
-					delay->AddHook(EventType::TimerClock, Hook("delay.TimerClock", [&](const std::any& param)
+					if (FieldHasBomb(field))
 					{
-						SwitchScene(lostScene);
-						DestroyTimer(delay);
-					}));
+						back->RemoveHook(EventType::Click, "back.Click");
+						leaderboard->RemoveHook(EventType::Click, "leaderboard.Click");
+						DestroyTimer(roundClock);
+
+						Timer* delay = CreateTimer(5000);
+						delay->AddHook(EventType::TimerClock, Hook("delay.TimerClock", [=](const std::any& param)
+						{
+							SwitchScene(lostScene);
+							DestroyTimer(delay);
+						}));
+					}
+					else
+					{
+						std::vector<Button*> fieldsWithinRadius = GetFieldsWithinRadius(fields, minefieldSize, i, currentSpec->sweepForce);
+						for (auto& btn : fieldsWithinRadius) btn->SetString(L"tk");
+					}
 				}));
 
 				field->AddHook(EventType::RightClick, Hook("field.RightClick", [field, &game, flags, &cascadia, &wingdings](const std::any& param)
@@ -284,30 +346,23 @@ namespace mwr
 			{
 				std::int32_t bombIndex = bombIndexes[i];
 
-				std::int32_t up = (bombIndex >= minefieldSize.x) ? (bombIndex - minefieldSize.x) : (- 1);
-				std::int32_t down = (bombIndex < minefieldCount - minefieldSize.x) ? (bombIndex + minefieldSize.x) : (-1);
-				std::int32_t left = (bombIndex % minefieldSize.x != 0) ? (bombIndex - 1) : (-1);
-				std::int32_t right = ((bombIndex + 1) % minefieldSize.x != 0) ? (bombIndex + 1) : (-1);
-				std::int32_t leftUp = (left != -1 && up != -1) ? (bombIndex - minefieldSize.x - 1) : (-1);
-				std::int32_t leftDown = (left != -1 && down != -1) ? (bombIndex + minefieldSize.x - 1) : (-1);
-				std::int32_t rightUp = (right != -1 && up != -1) ? (bombIndex - minefieldSize.x + 1) : (-1);
-				std::int32_t rightDown = (right != -1 && down != -1) ? (bombIndex + minefieldSize.x + 1) : (-1);
+				FieldNeighbours neighbours = GetNeighbours(fields, minefieldSize, bombIndex);
 
-				if (up != -1) adjacentBombs[up]++;
-				if (down != -1) adjacentBombs[down]++;
-				if (left != -1) adjacentBombs[left]++;
-				if (right != -1) adjacentBombs[right]++;
-				if (leftUp != -1) adjacentBombs[leftUp]++;
-				if (leftDown != -1) adjacentBombs[leftDown]++;
-				if (rightUp != -1) adjacentBombs[rightUp]++;
-				if (rightDown != -1) adjacentBombs[rightDown]++;
+				if (neighbours.up != -1) adjacentBombs[neighbours.up]++;
+				if (neighbours.down != -1) adjacentBombs[neighbours.down]++;
+				if (neighbours.left != -1) adjacentBombs[neighbours.left]++;
+				if (neighbours.right != -1) adjacentBombs[neighbours.right]++;
+				if (neighbours.leftUp != -1) adjacentBombs[neighbours.leftUp]++;
+				if (neighbours.leftDown != -1) adjacentBombs[neighbours.leftDown]++;
+				if (neighbours.rightUp != -1) adjacentBombs[neighbours.rightUp]++;
+				if (neighbours.rightDown != -1) adjacentBombs[neighbours.rightDown]++;
 			}
 
-			for (std::int32_t i = 0; i < minefieldCount; i++)
+			/*for (std::int32_t i = 0; i < minefieldCount; i++)
 			{
 				if (!FieldHasBomb(fields[i]))
 					fields[i]->SetString(std::to_wstring(adjacentBombs[i]));
-			}
+			}*/
 
 			roundClock->AddHook(EventType::TimerClock, Hook("roundClock.TimerClock", [time, &game, &minefieldScene, this, lostScene, roundClock](const std::any& param)
 			{
