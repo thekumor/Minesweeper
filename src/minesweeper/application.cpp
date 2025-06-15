@@ -81,9 +81,9 @@ namespace mwr
 		std::int32_t up, down, left, right, leftUp, leftDown, rightUp, rightDown;
 	};
 
-	static FieldNeighbours GetNeighbours(const std::vector<Button*>& fields, const Vec2i& minefieldSize, std::int32_t id)
+	static FieldNeighbours GetNeighbours(std::shared_ptr<std::vector<Button*>> fields, const Vec2i& minefieldSize, std::int32_t id)
 	{
-		const std::int32_t minefieldCount = fields.size();
+		const std::int32_t minefieldCount = fields->size();
 
 		std::int32_t up = (id >= minefieldSize.x) ? (id - minefieldSize.x) : (-1);
 		std::int32_t down = (id < minefieldCount - minefieldSize.x) ? (id + minefieldSize.x) : (-1);
@@ -107,13 +107,13 @@ namespace mwr
 		return neighbours;
 	}
 
-	static std::vector<Button*> GetFieldsWithinRadius(const std::vector<Button*>& fields, const Vec2i& minefieldSize, std::int32_t o, std::int32_t radius)
+	static std::vector<Button*> GetFieldsWithinRadius(std::shared_ptr<std::vector<Button*>> fields, const Vec2i& minefieldSize, std::int32_t o, float radius)
 	{
 		std::vector<Button*> buttons;
 		std::int32_t xO = o % minefieldSize.x;
 		std::int32_t yO = o / minefieldSize.x;
 
-		for (std::int32_t i = 0; i < fields.size(); i++)
+		for (std::int32_t i = 0; i < fields->size(); i++)
 		{
 			std::int32_t x = i % minefieldSize.x;
 			std::int32_t y = i / minefieldSize.x;
@@ -121,7 +121,7 @@ namespace mwr
 			float distance = sqrt(pow(xO - x, 2) + pow(yO - y, 2));
 
 			if (distance <= radius)
-				buttons.push_back(fields[i]);
+				buttons.push_back(fields->at(i));
 		}
 
 		return buttons;
@@ -139,7 +139,8 @@ namespace mwr
 		struct Specification
 		{
 			Vec2i minefieldSize;
-			std::int32_t time, totalBombs, totalFlags, sweepForce;
+			std::int32_t time, totalBombs, totalFlags;
+			float sweepForce;
 		};
 
 		Specification easySpec;
@@ -147,28 +148,28 @@ namespace mwr
 		easySpec.time = 5 * 60;
 		easySpec.totalBombs = 3;
 		easySpec.totalFlags = 10;
-		easySpec.sweepForce = 4;
+		easySpec.sweepForce = 2.0f;
 
 		Specification normalSpec;
 		normalSpec.minefieldSize = { 15, 15 };
 		normalSpec.time = 4 * 60;
 		normalSpec.totalBombs = 12;
 		normalSpec.totalFlags = 8;
-		easySpec.sweepForce = 7;
+		normalSpec.sweepForce = 3.0f;
 
 		Specification hardSpec;
 		hardSpec.minefieldSize = { 20, 20 };
 		hardSpec.time = 3 * 60;
 		hardSpec.totalBombs = 28;
 		hardSpec.totalFlags = 6;
-		easySpec.sweepForce = 6;
+		hardSpec.sweepForce = 3.0f;
 
 		Specification hellSpec;
 		hellSpec.minefieldSize = { 35, 25 };
 		hellSpec.time = 2 * 60;
 		hellSpec.totalBombs = 64;
 		hellSpec.totalFlags = 4;
-		easySpec.sweepForce = 5;
+		hellSpec.sweepForce = 2.0f;
 
 		Specification* currentSpec = nullptr;
 
@@ -260,8 +261,8 @@ namespace mwr
 
 			// Randomize field indexes that would contain a bomb.
 			std::vector<std::int32_t> bombIndexes = RandomNoRepetitions(currentSpec->totalBombs, 0, minefieldCount - 1);
-			std::vector<Button*> fields;
-			fields.reserve(minefieldCount);
+			std::shared_ptr<std::vector<Button*>> fields(new std::vector<Button*>);
+			fields->reserve(minefieldCount);
 
 			for (std::int32_t i = 0; i < minefieldCount; i++)
 			{
@@ -337,7 +338,7 @@ namespace mwr
 					flags->SetString(std::wstring(std::wstring(L"Flags left: ") + std::to_wstring(game.flagsLeft)));
 				}));
 
-				fields.push_back(field);
+				fields->push_back(field);
 			}
 
 			std::vector<std::int32_t> adjacentBombs(minefieldCount);
