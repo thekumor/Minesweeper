@@ -22,6 +22,8 @@ namespace mwr
 				SetSize(newControlSize, true);
 			}));
 		}
+
+		m_Listener.SetTag("Control");
 	}
 
 	Control::Control(const Control&& other)
@@ -60,6 +62,11 @@ namespace mwr
 	const std::vector<Control*>& Control::GetChildren()
 	{
 		return m_Children;
+	}
+
+	const std::wstring& Control::GetString() const
+	{
+		return m_String;
 	}
 
 	void Control::SetPosition(const Vec2i& position, bool isScreen)

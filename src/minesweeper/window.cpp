@@ -98,6 +98,12 @@ namespace mwr
 				g_Dispatcher.CallEventQualifier(EventType::Click, qualifier);
 			} break;
 
+			case WM_CONTEXTMENU:
+			{
+				void* qualifier = reinterpret_cast<void*>(wp);
+				g_Dispatcher.CallEventQualifier(EventType::RightClick, qualifier);
+			} break;
+
 			case WM_TIMER:
 			{
 				g_Dispatcher.CallEventQualifier(EventType::TimerClock, reinterpret_cast<void*>(wp));

@@ -29,6 +29,7 @@ namespace mwr
 		SceneOpen,
 		SceneClose,
 		TimerClock,
+		RightClick,
 	};
 
 	using EventCallback = std::function<void(const std::any&)>;
@@ -48,14 +49,18 @@ namespace mwr
 		EventListener() = default;
 		~EventListener();
 
+		std::string GetTag() const;
 		void* GetQualifier();
 		void OnCallEvent(EventType type, const std::any& data);
 		void AddHook(EventType eventType, const Hook& hook);
 		void RemoveHook(EventType eventType, const std::string& name);
+		void RemoveAllHooks(EventType eventType);
 		void SetQualifier(void* qualifier);
+		void SetTag(const std::string& tag);
 
 	private:
 		std::unordered_map<EventType, std::vector<Hook>> m_Hooks;
+		std::string m_Tag;
 		void* m_Qualifier;
 	};
 
@@ -87,6 +92,7 @@ namespace mwr
 
 		void AddHook(EventType eventType, const Hook& hook);
 		void RemoveHook(EventType eventType, const std::string& name);
+		void RemoveAllHooks(EventType eventType);
 
 	protected:
 		EventDispatcher m_Dispatcher;

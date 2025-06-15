@@ -13,6 +13,11 @@ namespace mwr
 	{
 	}
 
+	std::string EventListener::GetTag() const
+	{
+		return m_Tag;
+	}
+
 	void* EventListener::GetQualifier()
 	{
 		return m_Qualifier;
@@ -126,9 +131,25 @@ namespace mwr
 			}
 	}
 
+	void EventListener::RemoveAllHooks(EventType eventType)
+	{
+		// Is this even needed?
+		auto it = m_Hooks.find(eventType);
+
+		if (it == m_Hooks.end())
+			return;
+
+		m_Hooks[eventType].clear();
+	}
+
 	void EventListener::SetQualifier(void* qualifier)
 	{
 		m_Qualifier = qualifier;
+	}
+
+	void EventListener::SetTag(const std::string& tag)
+	{
+		m_Tag = tag;
 	}
 
 	mwr::EventDispatcher& EventActive::GetDispatcher()
@@ -149,6 +170,11 @@ namespace mwr
 	void EventActive::RemoveHook(EventType eventType, const std::string& name)
 	{
 		m_Listener.RemoveHook(eventType, name);
+	}
+
+	void EventActive::RemoveAllHooks(EventType eventType)
+	{
+		m_Listener.RemoveAllHooks(eventType);
 	}
 
 #endif

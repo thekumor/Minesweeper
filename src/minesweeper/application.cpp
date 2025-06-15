@@ -23,7 +23,57 @@ namespace mwr
 		std::uint32_t minutes = secondsLeft / 60;
 		std::wstring fmtSeconds = std::wstring(std::wstring(seconds < 10 ? L"0" : L"") + std::to_wstring(seconds));
 		std::wstring fmtMinutes = std::wstring(std::wstring(minutes < 10 ? L"0" : L"") + std::to_wstring(minutes));
+
 		return fmtMinutes + L":" + fmtSeconds;
+	}
+
+	static std::vector<std::int32_t> RandomNoRepetitions(std::int32_t amount, std::int32_t minimum, std::int32_t maximum)
+	{
+		std::vector<std::int32_t> values(amount);
+
+		for (std::int32_t i = 0; i < amount; i++)
+		{
+			std::int32_t value = minimum + rand() % (maximum + 1 - minimum);
+			bool existed = false;
+
+			for (std::int32_t j = 0; j < i; j++)
+			{
+				if (values[j] == value)
+				{
+					i--;
+					existed = true;
+					break;
+				}
+			}
+			if (!existed)
+				values[i] = value;
+		}
+
+		return values;
+	}
+
+	static bool FieldHasFlag(Control* field)
+	{
+		return field->GetTag()[1] == '1';
+	}
+
+	static bool FieldHasBomb(Control* field)
+	{
+		return field->GetTag()[0] == '1';
+	}
+
+	static void FieldSetHasFlag(Control* field, bool has)
+	{
+		std::string newTag = field->GetTag();
+		newTag[1] = has ? '1' : '0';
+		field->SetTag(newTag);
+	}
+
+	static void FieldSetHasBomb(Control* field, bool has)
+	{
+		std::string newTag = field->GetTag();
+		newTag[0] = has ? '1' : '0';
+		field->SetTag(newTag);
 	}
 
 	int Application::Run()
@@ -32,6 +82,8 @@ namespace mwr
 		Font cascadia(L"Cascadia Code", 24, FontStyle::Normal);
 		Font large(L"Georgia", 64, FontStyle::Bold);
 		Font smol(L"Arial", 16);
+		Font webdings(L"Webdings", 24);
+		Font wingdings(L"Wingdings", 24);
 
 		struct Specification
 		{
@@ -42,31 +94,32 @@ namespace mwr
 		Specification easySpec;
 		easySpec.minefieldSize = { 10, 10 };
 		easySpec.time = 5 * 60;
-		easySpec.totalBombs = 4;
+		easySpec.totalBombs = 3;
 		easySpec.totalFlags = 10;
 
 		Specification normalSpec;
 		normalSpec.minefieldSize = { 15, 15 };
 		normalSpec.time = 4 * 60;
-		normalSpec.totalBombs = 6;
+		normalSpec.totalBombs = 12;
 		normalSpec.totalFlags = 8;
 
 		Specification hardSpec;
 		hardSpec.minefieldSize = { 20, 20 };
-		hardSpec.time = 2 * 60;
-		hardSpec.totalBombs = 8;
+		hardSpec.time = 3 * 60;
+		hardSpec.totalBombs = 28;
 		hardSpec.totalFlags = 6;
 
 		Specification hellSpec;
 		hellSpec.minefieldSize = { 35, 25 };
-		hellSpec.time = 1 * 60;
-		hellSpec.totalBombs = 20;
+		hellSpec.time = 2 * 60;
+		hellSpec.totalBombs = 64;
 		hellSpec.totalFlags = 4;
 
 		Specification* currentSpec = nullptr;
 
 		Scene* difficultyScene = CreateScene("Difficulty Scene");
 		Scene* minefieldScene = CreateScene("Minefield Scene");
+		Scene* lostScene = CreateScene("Lost Scene");
 
 		difficultyScene->AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
 		{
@@ -121,9 +174,18 @@ namespace mwr
 			const Vec2i minefieldSize(currentSpec->minefieldSize);
 			const Vec2i fieldSize(32, 32);
 			const Vec2i margin(30, 90);
+			const std::int32_t minefieldCount = minefieldSize.x * minefieldSize.y;
 
 			Vec2i windowSize = minefieldSize * fieldSize + margin + Vec2i(250, 100);
 			window.SetSize(windowSize);
+
+			Button* leaderboard = minefieldScene->CreateControl<Button>(Vec2i(150, 40), Vec2i(windowSize.x - 200, margin.y), L"Leaderboard", &window, &cascadia);
+			Button* back = minefieldScene->CreateControl<Button>(Vec2i(150, 40), Vec2i(windowSize.x - 200, margin.y + 50), L"Back", &window, &cascadia);
+			back->AddHook(EventType::Click, Hook("back.Click", [&](const std::any& param)
+			{
+				DestroyTimer(roundClock);
+				SwitchScene(difficultyScene);
+			}));
 
 			Label* time = minefieldScene->CreateControl<Label>(
 				Vec2i(200, 30),
@@ -141,37 +203,134 @@ namespace mwr
 				&cascadia
 			);
 
-			for (std::int32_t y = 0; y < minefieldSize.y; y++)
+			// Randomize field indexes that would contain a bomb.
+			std::vector<std::int32_t> bombIndexes = RandomNoRepetitions(currentSpec->totalBombs, 0, minefieldCount - 1);
+			std::vector<Button*> fields;
+			fields.reserve(minefieldCount);
+
+			for (std::int32_t i = 0; i < minefieldCount; i++)
 			{
-				for (std::int32_t x = 0; x < minefieldSize.x; x++)
+				std::int32_t x = i % minefieldSize.x;
+				std::int32_t y = i / minefieldSize.x;
+
+				bool containsBomb = false;
+				for (std::int32_t j = 0; j < currentSpec->totalBombs; j++)
+					if (bombIndexes[j] == i)
+					{
+						containsBomb = true;
+						break;
+					}
+
+				Button* field = minefieldScene->CreateControl<Button>(
+					fieldSize,
+					Vec2i(margin.x + x * fieldSize.x, margin.y + y * fieldSize.y),
+					(containsBomb) ? L"M" : L"",
+					&window,
+					(containsBomb) ? &wingdings : &cascadia
+				);
+
+				// Tag goes like that: bomb;flag
+				field->SetTag("xx");
+				FieldSetHasBomb(field, containsBomb);
+				FieldSetHasFlag(field, false);
+
+				field->AddHook(EventType::Click, Hook("field.Click", [=](const std::any& param)
 				{
-					Button* field = minefieldScene->CreateControl<Button>(
-						fieldSize,
-						Vec2i(margin.x + x * fieldSize.x, margin.y + y * fieldSize.y),
-						L"",
-						&window,
-						&cascadia
-					);
-					field->SetTag(std::to_string(y * minefieldSize.x + x));
-				}
+					if (!FieldHasBomb(field)) return;
+
+					back->RemoveHook(EventType::Click, "back.Click");
+					leaderboard->RemoveHook(EventType::Click, "leaderboard.Click");
+					DestroyTimer(roundClock);
+
+					Timer* delay = CreateTimer(5000);
+					delay->AddHook(EventType::TimerClock, Hook("delay.TimerClock", [&](const std::any& param)
+					{
+						SwitchScene(lostScene);
+						DestroyTimer(delay);
+					}));
+				}));
+
+				field->AddHook(EventType::RightClick, Hook("field.RightClick", [field, &game, flags, &cascadia, &wingdings](const std::any& param)
+				{
+					// Already has a flag - remove it.
+					if (FieldHasFlag(field))
+					{
+						game.flagsLeft++;
+						FieldSetHasFlag(field, false);
+						field->SetFont(&cascadia);
+						field->SetString(L"");
+					}
+					// Has no flag - place it.
+					else
+					{
+						if (game.flagsLeft <= 0) return;
+
+						game.flagsLeft--;
+						FieldSetHasFlag(field, true);
+						field->SetFont(&wingdings);
+						field->SetString(L"P");
+					}
+
+					// Update the flag counter.
+					flags->SetString(std::wstring(std::wstring(L"Flags left: ") + std::to_wstring(game.flagsLeft)));
+				}));
+
+				fields.push_back(field);
 			}
 
-			roundClock->AddHook(EventType::TimerClock, Hook("roundClock.Clock", [&](const std::any& param)
+			std::vector<std::int32_t> adjacentBombs(minefieldCount);
+
+			for (std::int32_t i = 0; i < currentSpec->totalBombs; i++)
+			{
+				std::int32_t bombIndex = bombIndexes[i];
+
+				std::int32_t up = (bombIndex >= minefieldSize.x) ? (bombIndex - minefieldSize.x) : (- 1);
+				std::int32_t down = (bombIndex < minefieldCount - minefieldSize.x) ? (bombIndex + minefieldSize.x) : (-1);
+				std::int32_t left = (bombIndex % minefieldSize.x != 0) ? (bombIndex - 1) : (-1);
+				std::int32_t right = ((bombIndex + 1) % minefieldSize.x != 0) ? (bombIndex + 1) : (-1);
+				std::int32_t leftUp = (left != -1 && up != -1) ? (bombIndex - minefieldSize.x - 1) : (-1);
+				std::int32_t leftDown = (left != -1 && down != -1) ? (bombIndex + minefieldSize.x - 1) : (-1);
+				std::int32_t rightUp = (right != -1 && up != -1) ? (bombIndex - minefieldSize.x + 1) : (-1);
+				std::int32_t rightDown = (right != -1 && down != -1) ? (bombIndex + minefieldSize.x + 1) : (-1);
+
+				if (up != -1) adjacentBombs[up]++;
+				if (down != -1) adjacentBombs[down]++;
+				if (left != -1) adjacentBombs[left]++;
+				if (right != -1) adjacentBombs[right]++;
+				if (leftUp != -1) adjacentBombs[leftUp]++;
+				if (leftDown != -1) adjacentBombs[leftDown]++;
+				if (rightUp != -1) adjacentBombs[rightUp]++;
+				if (rightDown != -1) adjacentBombs[rightDown]++;
+			}
+
+			for (std::int32_t i = 0; i < minefieldCount; i++)
+			{
+				if (!FieldHasBomb(fields[i]))
+					fields[i]->SetString(std::to_wstring(adjacentBombs[i]));
+			}
+
+			roundClock->AddHook(EventType::TimerClock, Hook("roundClock.TimerClock", [time, &game, &minefieldScene, this, lostScene, roundClock](const std::any& param)
 			{
 				game.secondsLeft--;
 				game.formattedTimeLeft = FormatTime(game.secondsLeft);
 
-				// Capture wouldn't work here. Alternatively, just put the Timer* before the first lambda.
-				minefieldScene->GetControlByTag("Time")->SetString(L"Time left: " + game.formattedTimeLeft);
-			}));
+				if (game.secondsLeft == -1)
+				{
+					DestroyTimer(roundClock);
+					SwitchScene(lostScene);
+					return;
+				}
 
-			// Side menu
-			Button* leaderboard = minefieldScene->CreateControl<Button>(Vec2i(150, 40), Vec2i(windowSize.x - 200, margin.y), L"Leaderboard", &window, &cascadia);
-			Button* back = minefieldScene->CreateControl<Button>(Vec2i(150, 40), Vec2i(windowSize.x - 200, margin.y + 50), L"Back", &window, &cascadia);
+				time->SetString(L"Time left: " + game.formattedTimeLeft);
+			}));
+		}));
+
+		lostScene->AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
+		{
+			Label* title = lostScene->CreateControl<Label>(Vec2i(280, 60), Vec2i(200, 30), L"You lost!", &window, &large);
+			Button* back = lostScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 200), L"Return to menu", &window, &cascadia);
 			back->AddHook(EventType::Click, Hook("Back.Click", [&](const std::any& param)
 			{
-				roundClock->RemoveHook(EventType::TimerClock, "roundClock.Clock");
-				DestroyTimer(roundClock);
 				SwitchScene(difficultyScene);
 			}));
 		}));
@@ -212,7 +371,9 @@ namespace mwr
 		{
 			if (*it == ptr)
 			{
+				ptr->RemoveAllHooks(EventType::TimerClock); //TODO: remove this
 				m_Timers.erase(it);
+				delete ptr;
 				return;
 			}
 		}
@@ -241,6 +402,7 @@ namespace mwr
 		m_Name(name)
 	{
 		m_Listener.SetQualifier(this);
+		m_Listener.SetTag("Scene");
 
 		AddHook(EventType::SceneClose, Hook("Scene.SceneClose", [&](const std::any& param)
 		{
@@ -266,3 +428,21 @@ namespace mwr
 	}
 
 }
+
+#ifdef _DEBUG
+static std::int64_t s_memoryUse;
+void* operator new(size_t size)
+{
+	void* address = malloc(size);
+	s_memoryUse += size;
+
+	return address;
+}
+
+void operator delete(void* ptr, size_t size)
+{
+	s_memoryUse -= size;
+
+	free(ptr);
+}
+#endif

@@ -6,6 +6,8 @@ namespace mwr
 	Font::Font(const std::wstring& name, std::int32_t size, std::uint32_t style)
 		: m_Style(style), m_Size(size), m_ScreenSize(size), m_Name(name)
 	{
+		bool isSymbol = (name == L"Webdings" || name == L"Wingdings");
+
 		m_Handle = CreateFontW(
 			size,
 			0,
@@ -15,12 +17,12 @@ namespace mwr
 			style & FontStyle::Italic ? TRUE : FALSE,
 			style & FontStyle::Underline ? TRUE : FALSE,
 			style & FontStyle::StrikeOut ? TRUE : FALSE,
-			EASTEUROPE_CHARSET,
+			isSymbol ? SYMBOL_CHARSET : EASTEUROPE_CHARSET,
 			OUT_DEFAULT_PRECIS,
 			CLIP_DEFAULT_PRECIS,
 			CLEARTYPE_QUALITY,
 			FF_DONTCARE,
-			name.c_str()
+			isSymbol ? L"Arial" : name.c_str()
 		);
 		MsgIfError("Font.m_Handle");
 
@@ -28,6 +30,7 @@ namespace mwr
 		{
 			Vec2<float> fraction = std::any_cast<Vec2<float>>(param);
 		}));
+		m_Listener.SetTag("Font");
 	}
 
 	Font::~Font()

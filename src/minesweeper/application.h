@@ -4,6 +4,10 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <cstdlib>
+#ifdef _DEBUG
+#include <unordered_map>
+#endif
 
 // WinAPI
 #include <windows.h>
@@ -15,6 +19,11 @@
 #include <minesweeper/fonts.h>
 #include <minesweeper/timer.h>
 #include <minesweeper/events.h>
+
+#ifdef _DEBUG
+void* operator new(size_t size);
+void operator delete(void* ptr, size_t size);
+#endif
 
 namespace mwr
 {

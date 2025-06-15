@@ -9,6 +9,7 @@
 // STL
 #include <cstdlib>
 #include <unordered_map>
+#include <ctime>
 
 // WinAPI
 #include <windows.h>
@@ -25,6 +26,8 @@ std::unordered_map<HWND, mwr::Vec2i> mwr::g_WindowSizes;
 #pragma warning(suppress:28251)
 int APIENTRY wWinMain(HINSTANCE instance, HINSTANCE previousInstance, LPWSTR cmdLine, int cmdShow)
 {
+	srand(time(nullptr));
+
 	mwr::Application app(instance, mwr::Vec2i(MWR_WIDTH, MWR_HEIGHT), MWR_TITLE);
 	return app.Run();
 }

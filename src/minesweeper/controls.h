@@ -31,6 +31,7 @@ namespace mwr
 		static Vec2i s_GetSize(HWND handle);
 
 		const std::vector<Control*>& GetChildren();
+		const std::wstring& GetString() const;
 		Control* GetParent();
 		const std::string& GetTag() const;
 		void SetPosition(const Vec2i& position, bool isScreen = false);

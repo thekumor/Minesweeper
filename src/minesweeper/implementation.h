@@ -1,5 +1,6 @@
 // STL
 #include <unordered_map>
+#include <vector>
 
 // WinAPI
 #include <windows.h>

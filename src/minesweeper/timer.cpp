@@ -13,6 +13,7 @@ namespace mwr
 		MsgIfError("Timer.SetTimer");
 
 		m_Listener.SetQualifier(reinterpret_cast<void*>(m_Id));
+		m_Listener.SetTag("Timer");
 	}
 
 	Timer::~Timer()
