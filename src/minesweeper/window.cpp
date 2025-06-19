@@ -49,7 +49,7 @@ namespace mwr
 		if (windowSizeValue != g_WindowSizes.end())
 		{
 			Vec2i initialWindowSize = windowSizeValue->second;
-			Vec2i currentWindowSize = Control::s_GetSize(handle);
+			Vec2i currentWindowSize = Control::GetSize(handle);
 			Vec2i difference = Window::GetRealSizeDifference(handle);
 			Vec2i currentClientSize = currentWindowSize - difference;
 

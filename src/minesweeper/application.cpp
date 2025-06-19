@@ -76,12 +76,12 @@ namespace mwr
 		field->SetTag(newTag);
 	}
 
-	static struct FieldNeighbours
+	static struct FieldNeighbors
 	{
 		std::int32_t up, down, left, right, leftUp, leftDown, rightUp, rightDown;
 	};
 
-	static FieldNeighbours GetNeighbours(std::shared_ptr<std::vector<Button*>> fields, const Vec2i& minefieldSize, std::int32_t id)
+	static FieldNeighbors GetNeighbors(std::shared_ptr<std::vector<Button*>> fields, const Vec2i& minefieldSize, std::int32_t id)
 	{
 		const std::int32_t minefieldCount = fields->size();
 
@@ -94,22 +94,22 @@ namespace mwr
 		std::int32_t rightUp = (right != -1 && up != -1) ? (id - minefieldSize.x + 1) : (-1);
 		std::int32_t rightDown = (right != -1 && down != -1) ? (id + minefieldSize.x + 1) : (-1);
 
-		FieldNeighbours neighbours;
-		neighbours.up = up;
-		neighbours.down = down;
-		neighbours.left = left;
-		neighbours.right = right;
-		neighbours.leftUp = leftUp;
-		neighbours.leftDown = leftDown;
-		neighbours.rightUp = rightUp;
-		neighbours.rightDown = rightDown;
+		FieldNeighbors neighbors;
+		neighbors.up = up;
+		neighbors.down = down;
+		neighbors.left = left;
+		neighbors.right = right;
+		neighbors.leftUp = leftUp;
+		neighbors.leftDown = leftDown;
+		neighbors.rightUp = rightUp;
+		neighbors.rightDown = rightDown;
 
-		return neighbours;
+		return neighbors;
 	}
 
-	static std::vector<Button*> GetFieldsWithinRadius(std::shared_ptr<std::vector<Button*>> fields, const Vec2i& minefieldSize, std::int32_t o, float radius)
+	static std::vector<std::pair<std::int32_t, Button*>> GetFieldsWithinRadius(std::shared_ptr<std::vector<Button*>> fields, const Vec2i& minefieldSize, std::int32_t o, float radius)
 	{
-		std::vector<Button*> buttons;
+		std::vector<std::pair<std::int32_t, Button*>> buttons;
 		std::int32_t xO = o % minefieldSize.x;
 		std::int32_t yO = o / minefieldSize.x;
 
@@ -121,7 +121,7 @@ namespace mwr
 			float distance = sqrt(pow(xO - x, 2) + pow(yO - y, 2));
 
 			if (distance <= radius)
-				buttons.push_back(fields->at(i));
+				buttons.push_back(std::pair<std::int32_t, Button*>(i, fields->at(i)));
 		}
 
 		return buttons;
@@ -145,46 +145,48 @@ namespace mwr
 
 		Specification easySpec;
 		easySpec.minefieldSize = { 10, 10 };
-		easySpec.time = 5 * 60;
+		easySpec.time = 4.5 * 60;
 		easySpec.totalBombs = 3;
-		easySpec.totalFlags = 10;
+		easySpec.totalFlags = 5;
 		easySpec.sweepForce = 2.0f;
 
 		Specification normalSpec;
 		normalSpec.minefieldSize = { 15, 15 };
 		normalSpec.time = 4 * 60;
 		normalSpec.totalBombs = 12;
-		normalSpec.totalFlags = 8;
+		normalSpec.totalFlags = 14;
 		normalSpec.sweepForce = 3.0f;
 
 		Specification hardSpec;
 		hardSpec.minefieldSize = { 20, 20 };
-		hardSpec.time = 3 * 60;
+		hardSpec.time = 3.5 * 60;
 		hardSpec.totalBombs = 28;
-		hardSpec.totalFlags = 6;
+		hardSpec.totalFlags = 30;
 		hardSpec.sweepForce = 3.0f;
 
 		Specification hellSpec;
 		hellSpec.minefieldSize = { 35, 25 };
-		hellSpec.time = 2 * 60;
+		hellSpec.time = 3 * 60;
 		hellSpec.totalBombs = 64;
-		hellSpec.totalFlags = 4;
+		hellSpec.totalFlags = 64;
 		hellSpec.sweepForce = 2.0f;
 
 		Specification* currentSpec = nullptr;
 
 		Scene* difficultyScene = CreateScene("Difficulty Scene");
 		Scene* minefieldScene = CreateScene("Minefield Scene");
-		Scene* lostScene = CreateScene("Lost Scene");
+		Scene* loseScene = CreateScene("Lose Scene");
+		Scene* winScene = CreateScene("Win Scene");
 
 		difficultyScene->AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
 		{
-			Label* title = difficultyScene->CreateControl<Label>(Vec2i(400, 60), Vec2i(150, 30), L"Minesweeper", &window, &large);
+			Label* title = difficultyScene->CreateControl<Label>(Vec2i(400, 67), Vec2i(150, 30), L"Minesweeper", &window, &large);
 			Button* easy = difficultyScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 120), L"Easy", &window, &cascadia);
 			Button* normal = difficultyScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 200), L"Normal", &window, &cascadia);
 			Button* hard = difficultyScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 280), L"Hard", &window, &cascadia);
 			Button* hell = difficultyScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 360), L"Hell", &window, &cascadia);
-			Label* author = difficultyScene->CreateControl<Label>(Vec2i(130, 25), Vec2i(520, 625), L"by The Kumor, (2025)", &window, &smol);
+			Button* leaderboard = difficultyScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 440), L"High Scores", &window, &cascadia);
+			Label* author = difficultyScene->CreateControl<Label>(Vec2i(130, 20), Vec2i(520, 625), L"by The Kumor, (2025)", &window, &smol);
 
 			easy->AddHook(EventType::Click, Hook("Easy.Click", [&](const std::any& param)
 			{
@@ -235,8 +237,7 @@ namespace mwr
 			Vec2i windowSize = minefieldSize * fieldSize + margin + Vec2i(250, 100);
 			window.SetSize(windowSize);
 
-			Button* leaderboard = minefieldScene->CreateControl<Button>(Vec2i(150, 40), Vec2i(windowSize.x - 200, margin.y), L"Leaderboard", &window, &cascadia);
-			Button* back = minefieldScene->CreateControl<Button>(Vec2i(150, 40), Vec2i(windowSize.x - 200, margin.y + 50), L"Back", &window, &cascadia);
+			Button* back = minefieldScene->CreateControl<Button>(Vec2i(150, 40), Vec2i(windowSize.x - 200, margin.y), L"Back", &window, &cascadia);
 			back->AddHook(EventType::Click, Hook("back.Click", [&](const std::any& param)
 			{
 				DestroyTimer(roundClock);
@@ -261,7 +262,10 @@ namespace mwr
 
 			// Randomize field indexes that would contain a bomb.
 			std::vector<std::int32_t> bombIndexes = RandomNoRepetitions(currentSpec->totalBombs, 0, minefieldCount - 1);
+
+			// This is std::shared_ptr so that lambdas don't store an expired copy.
 			std::shared_ptr<std::vector<Button*>> fields(new std::vector<Button*>);
+			std::shared_ptr<std::vector<std::int32_t>> adjacentBombs(new std::vector<std::int32_t>(minefieldCount));
 			fields->reserve(minefieldCount);
 
 			for (std::int32_t i = 0; i < minefieldCount; i++)
@@ -280,40 +284,58 @@ namespace mwr
 				Button* field = minefieldScene->CreateControl<Button>(
 					fieldSize,
 					Vec2i(margin.x + x * fieldSize.x, margin.y + y * fieldSize.y),
-					 (containsBomb) ? L"M" : L"",
-					//L"",
+					//(containsBomb) ? L"M" : L"",
+					L"",
 					&window,
 					(containsBomb) ? &wingdings : &cascadia
 				);
 
-				// Tag goes like that: bomb;flag
+				// Tag goes: bomb;flag
 				field->SetTag("xx");
 				FieldSetHasBomb(field, containsBomb);
 				FieldSetHasFlag(field, false);
 
-				field->AddHook(EventType::Click, Hook("field.Click", [=](const std::any& param)
+				field->AddHook(EventType::Click, Hook("field.Click", [=, &wingdings, &cascadia](const std::any& param)
 				{
 					if (FieldHasBomb(field))
 					{
 						back->RemoveHook(EventType::Click, "back.Click");
-						leaderboard->RemoveHook(EventType::Click, "leaderboard.Click");
 						DestroyTimer(roundClock);
+
+						for (std::int32_t j : bombIndexes)
+						{
+							fields->at(j)->SetFont(&wingdings);
+							fields->at(j)->SetString(L"M");
+						}
 
 						Timer* delay = CreateTimer(5000);
 						delay->AddHook(EventType::TimerClock, Hook("delay.TimerClock", [=](const std::any& param)
 						{
-							SwitchScene(lostScene);
+							SwitchScene(loseScene);
 							DestroyTimer(delay);
 						}));
 					}
 					else
 					{
-						std::vector<Button*> fieldsWithinRadius = GetFieldsWithinRadius(fields, minefieldSize, i, currentSpec->sweepForce);
-						for (auto& btn : fieldsWithinRadius) btn->SetString(L"tk");
+						std::vector<std::pair<std::int32_t, Button*>> fieldsWithinRadius = GetFieldsWithinRadius(fields, minefieldSize, i, currentSpec->sweepForce);
+
+						for (auto[id, btn] : fieldsWithinRadius)
+						{
+							if (FieldHasBomb(btn)) continue;
+
+							if (adjacentBombs->at(id) != 0)
+							{
+								btn->SetFont(&cascadia);
+								btn->SetString(std::to_wstring(adjacentBombs->at(id)));
+								btn->SetDisabled(true);
+							}
+							else
+								btn->SetPosition(Vec2i(-100, -100));
+						}
 					}
 				}));
 
-				field->AddHook(EventType::RightClick, Hook("field.RightClick", [field, &game, flags, &cascadia, &wingdings](const std::any& param)
+				field->AddHook(EventType::RightClick, Hook("field.RightClick", [=, &game, &cascadia, &wingdings](const std::any& param)
 				{
 					// Already has a flag - remove it.
 					if (FieldHasFlag(field))
@@ -332,6 +354,20 @@ namespace mwr
 						FieldSetHasFlag(field, true);
 						field->SetFont(&wingdings);
 						field->SetString(L"P");
+
+						// Check if player wins by flagging all mines.
+						std::int32_t flaggedMines = 0;
+						for (std::int32_t j : bombIndexes)
+						{
+							if (FieldHasFlag(fields->at(j)))
+								flaggedMines++;
+						}
+						if (flaggedMines == currentSpec->totalBombs)
+						{
+							DestroyTimer(roundClock);
+							SwitchScene(winScene);
+							return;
+						}
 					}
 
 					// Update the flag counter.
@@ -341,39 +377,31 @@ namespace mwr
 				fields->push_back(field);
 			}
 
-			std::vector<std::int32_t> adjacentBombs(minefieldCount);
-
 			for (std::int32_t i = 0; i < currentSpec->totalBombs; i++)
 			{
 				std::int32_t bombIndex = bombIndexes[i];
 
-				FieldNeighbours neighbours = GetNeighbours(fields, minefieldSize, bombIndex);
+				FieldNeighbors neighbors = GetNeighbors(fields, minefieldSize, bombIndex);
 
-				if (neighbours.up != -1) adjacentBombs[neighbours.up]++;
-				if (neighbours.down != -1) adjacentBombs[neighbours.down]++;
-				if (neighbours.left != -1) adjacentBombs[neighbours.left]++;
-				if (neighbours.right != -1) adjacentBombs[neighbours.right]++;
-				if (neighbours.leftUp != -1) adjacentBombs[neighbours.leftUp]++;
-				if (neighbours.leftDown != -1) adjacentBombs[neighbours.leftDown]++;
-				if (neighbours.rightUp != -1) adjacentBombs[neighbours.rightUp]++;
-				if (neighbours.rightDown != -1) adjacentBombs[neighbours.rightDown]++;
+				if (neighbors.up != -1) adjacentBombs->at(neighbors.up)++;
+				if (neighbors.down != -1) adjacentBombs->at(neighbors.down)++;
+				if (neighbors.left != -1) adjacentBombs->at(neighbors.left)++;
+				if (neighbors.right != -1) adjacentBombs->at(neighbors.right)++;
+				if (neighbors.leftUp != -1) adjacentBombs->at(neighbors.leftUp)++;
+				if (neighbors.leftDown != -1) adjacentBombs->at(neighbors.leftDown)++;
+				if (neighbors.rightUp != -1) adjacentBombs->at(neighbors.rightUp)++;
+				if (neighbors.rightDown != -1) adjacentBombs->at(neighbors.rightDown)++;
 			}
 
-			/*for (std::int32_t i = 0; i < minefieldCount; i++)
-			{
-				if (!FieldHasBomb(fields[i]))
-					fields[i]->SetString(std::to_wstring(adjacentBombs[i]));
-			}*/
-
-			roundClock->AddHook(EventType::TimerClock, Hook("roundClock.TimerClock", [time, &game, &minefieldScene, this, lostScene, roundClock](const std::any& param)
+			roundClock->AddHook(EventType::TimerClock, Hook("roundClock.TimerClock", [=, &game](const std::any& param)
 			{
 				game.secondsLeft--;
 				game.formattedTimeLeft = FormatTime(game.secondsLeft);
 
 				if (game.secondsLeft == -1)
 				{
+					SwitchScene(loseScene);
 					DestroyTimer(roundClock);
-					SwitchScene(lostScene);
 					return;
 				}
 
@@ -381,10 +409,20 @@ namespace mwr
 			}));
 		}));
 
-		lostScene->AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
+		loseScene->AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
 		{
-			Label* title = lostScene->CreateControl<Label>(Vec2i(280, 60), Vec2i(200, 30), L"You lost!", &window, &large);
-			Button* back = lostScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 200), L"Return to menu", &window, &cascadia);
+			Label* title = loseScene->CreateControl<Label>(Vec2i(280, 67), Vec2i(200, 30), L"You lost!", &window, &large);
+			Button* back = loseScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 200), L"Return to menu", &window, &cascadia);
+			back->AddHook(EventType::Click, Hook("Back.Click", [&](const std::any& param)
+			{
+				SwitchScene(difficultyScene);
+			}));
+		}));
+
+		winScene->AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
+		{
+			Label* title = winScene->CreateControl<Label>(Vec2i(280, 67), Vec2i(200, 30), L"You won!", &window, &large);
+			Button* back = winScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 200), L"Return to menu", &window, &cascadia);
 			back->AddHook(EventType::Click, Hook("Back.Click", [&](const std::any& param)
 			{
 				SwitchScene(difficultyScene);

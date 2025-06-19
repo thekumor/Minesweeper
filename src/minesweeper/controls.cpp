@@ -5,7 +5,7 @@ namespace mwr
 
 	Control::Control(const Vec2i& size, const Vec2i& position, const std::wstring& string, Control* parent, Font* font)
 		: m_Parent(parent), m_Font(font), m_Handle(nullptr), m_Size(size), m_Position(position), m_String(string),
-		m_ScreenSize(size), m_ScreenPosition(position)
+		m_ScreenSize(size), m_ScreenPosition(position), m_Disabled(false)
 	{
 		if (parent)
 		{
@@ -51,7 +51,12 @@ namespace mwr
 		return m_Tag;
 	}
 
-	Vec2i Control::s_GetSize(HWND handle)
+	bool Control::IsDisabled() const
+	{
+		return m_Disabled;
+	}
+
+	Vec2i Control::GetSize(HWND handle)
 	{
 		RECT rect;
 		GetWindowRect(handle, &rect);
@@ -118,13 +123,19 @@ namespace mwr
 		m_Font = font;
 	}
 
+	void Control::SetDisabled(bool disabled)
+	{
+		m_Disabled = disabled;
+		EnableWindow(m_Handle, !disabled);
+	}
+
 	Label::Label(const Vec2i& size, const Vec2i& position, const std::wstring& string, Control* parent, Font* font)
 		: Control(size, position, string, parent, font)
 	{
 		m_Handle = CreateWindowW(
 			L"Static",
 			string.c_str(),
-			parent ? WS_CHILD : 0,
+			(parent ? WS_CHILD : 0) | SS_CENTER,
 			position.x,
 			position.y,
 			size.x,

@@ -28,20 +28,23 @@ namespace mwr
 		Control();
 		virtual ~Control();
 
-		static Vec2i s_GetSize(HWND handle);
+		static Vec2i GetSize(HWND handle);
 
+		Control* GetParent();
 		const std::vector<Control*>& GetChildren();
 		const std::wstring& GetString() const;
-		Control* GetParent();
 		const std::string& GetTag() const;
+		bool IsDisabled() const;
 		void SetPosition(const Vec2i& position, bool isScreen = false);
 		void SetSize(const Vec2i& size, bool isScreen = false);
 		void SetString(const std::wstring& string);
 		void SetTag(const std::string& tag);
 		void SetParent(Control* parent);
 		void SetFont(Font* font);
+		void SetDisabled(bool disabled);
 
 	protected:
+		bool m_Disabled;
 		Control* m_Parent;
 		Font* m_Font;
 		HWND m_Handle;
