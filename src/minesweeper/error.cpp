@@ -22,4 +22,9 @@ namespace mwr
 		return errorCode;
 	}
 
+	void Message(const char* what)
+	{
+		MessageBoxA(nullptr, what, "Message", IDOK);
+	}
+
 }

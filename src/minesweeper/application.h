@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstdlib>
 #include <cmath>
+#include <fstream>
 
 // WinAPI
 #include <windows.h>
@@ -27,6 +28,7 @@ namespace mwr
 {
 
 	class Scene;
+	class Leaderboard;
 
 	class Application
 	{
@@ -73,6 +75,51 @@ namespace mwr
 	private:
 		std::string m_Name;
 		std::vector<Control*> m_Controls;
+	};
+
+#define MWR_DUMMY_DATE Date(0, 0, 0, 0, 0, 0)
+	struct Date
+	{
+		Date(std::uint32_t year, std::uint32_t month, std::uint32_t day, std::uint32_t hour, std::uint32_t minute, std::uint32_t second);
+		Date() = default;
+		std::string GetDateFormat(const std::string& format);
+
+		std::uint32_t Year, Month, Day, Hour, Minute, Second;
+	};
+
+	struct LeaderboardEntry
+	{
+		LeaderboardEntry(const std::string& player, Date timestamp, std::uint32_t time, std::uint32_t flagsUsed, const std::string& difficultyName);
+		LeaderboardEntry() = default;
+
+		std::string Player, DifficultyName;
+		Date Timestamp;
+		std::uint32_t Time;
+		std::uint32_t FlagsUsed;
+	};
+
+#define MWR_WRITE_HANDLE true
+#define MWR_READ_HANDLE false
+
+	class Leaderboard : public BaseClass
+	{
+	public:
+		Leaderboard(const std::string& filePath);
+		Leaderboard() = default;
+		~Leaderboard();
+
+		const std::vector<LeaderboardEntry>& GetEntries() const;
+		void AddEntry(const LeaderboardEntry& entry);
+
+	private:
+		bool Impl_OpenFile(bool isForWriting = MWR_READ_HANDLE);
+		bool Impl_UpdateFile();
+		bool Impl_ReadFromFile();
+		bool Impl_CloseFile(bool isForWriting = MWR_READ_HANDLE);
+
+		HANDLE m_Write, m_Read;
+		std::vector<LeaderboardEntry> m_Entries;
+		std::string m_FilePath;
 	};
 
 }

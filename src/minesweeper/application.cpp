@@ -177,8 +177,9 @@ namespace mwr
 		Scene* minefieldScene = CreateScene("Minefield Scene");
 		Scene* loseScene = CreateScene("Lose Scene");
 		Scene* winScene = CreateScene("Win Scene");
+		Scene* highScoresScene = CreateScene("High Scores Scene");
 
-		difficultyScene->AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
+		difficultyScene->AddHook(EventType::SceneOpen, Hook("difficultyScene.Open", [&](const std::any& param)
 		{
 			Label* title = difficultyScene->CreateControl<Label>(Vec2i(400, 67), Vec2i(150, 30), L"Minesweeper", &window, &large);
 			Button* easy = difficultyScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 120), L"Easy", &window, &cascadia);
@@ -211,6 +212,11 @@ namespace mwr
 				currentSpec = &hellSpec;
 				SwitchScene(minefieldScene);
 			}));
+
+			leaderboard->AddHook(EventType::Click, Hook("Leaderboard.Click", [&](const std::any& param)
+			{
+				SwitchScene(highScoresScene);
+			}));
 		}));
 		struct Game
 		{
@@ -221,7 +227,7 @@ namespace mwr
 
 		Timer* roundClock;
 
-		minefieldScene->AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
+		minefieldScene->AddHook(EventType::SceneOpen, Hook("minefieldScene.Open", [&](const std::any& param)
 		{
 			roundClock = CreateTimer(1000);
 
@@ -319,7 +325,7 @@ namespace mwr
 					{
 						std::vector<std::pair<std::int32_t, Button*>> fieldsWithinRadius = GetFieldsWithinRadius(fields, minefieldSize, i, currentSpec->sweepForce);
 
-						for (auto[id, btn] : fieldsWithinRadius)
+						for (auto [id, btn] : fieldsWithinRadius)
 						{
 							if (FieldHasBomb(btn)) continue;
 
@@ -409,7 +415,27 @@ namespace mwr
 			}));
 		}));
 
-		loseScene->AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
+		highScoresScene->AddHook(EventType::SceneOpen, Hook("highScoresScene.Open", [&](const std::any& param)
+		{
+			Label* title = difficultyScene->CreateControl<Label>(Vec2i(400, 67), Vec2i(150, 30), L"High Scores", &window, &large);
+
+			std::vector<Button*> scoreList = {};
+			for (std::int32_t i = 0; i < 8; i++)
+			{
+				Button* button = highScoresScene->CreateControl<Button>(Vec2i(200, 40), Vec2i(250, i * 50 + 120), std::to_wstring(i).c_str(), &window, &cascadia);
+			}
+
+			Button* up = highScoresScene->CreateControl<Button>(Vec2i(60, 50), Vec2i(600, 150), { L'\u02C4', L'\0'}, &window, &cascadia);
+			Button* down = highScoresScene->CreateControl<Button>(Vec2i(60, 50), Vec2i(600, 210), { L'\u02C5', L'\0'}, &window, &cascadia);
+
+			Button* back = highScoresScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 540), L"Back", &window, &cascadia);
+			back->AddHook(EventType::Click, Hook("Back.Click", [&](const std::any& param)
+			{
+				SwitchScene(difficultyScene);
+			}));
+		}));
+
+		loseScene->AddHook(EventType::SceneOpen, Hook("loseScene.Open", [&](const std::any& param)
 		{
 			Label* title = loseScene->CreateControl<Label>(Vec2i(280, 67), Vec2i(200, 30), L"You lost!", &window, &large);
 			Button* back = loseScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 200), L"Return to menu", &window, &cascadia);
@@ -419,7 +445,7 @@ namespace mwr
 			}));
 		}));
 
-		winScene->AddHook(EventType::SceneOpen, Hook("Scene.Open", [&](const std::any& param)
+		winScene->AddHook(EventType::SceneOpen, Hook("winScene.Open", [&](const std::any& param)
 		{
 			Label* title = winScene->CreateControl<Label>(Vec2i(280, 67), Vec2i(200, 30), L"You won!", &window, &large);
 			Button* back = winScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 200), L"Return to menu", &window, &cascadia);
@@ -521,21 +547,182 @@ namespace mwr
 				return k;
 	}
 
+	Leaderboard::Leaderboard(const std::string& filePath)
+		: m_FilePath(filePath), m_Read(INVALID_HANDLE_VALUE), m_Write(INVALID_HANDLE_VALUE)
+	{
+		Impl_OpenFile();
+		Impl_ReadFromFile();
+		Impl_CloseFile();
+	}
+
+	Leaderboard::~Leaderboard()
+	{
+		Impl_CloseFile(MWR_READ_HANDLE);
+		Impl_CloseFile(MWR_WRITE_HANDLE);
+	}
+
+	const std::vector<LeaderboardEntry>& Leaderboard::GetEntries() const
+	{
+		return m_Entries;
+	}
+
+	void Leaderboard::AddEntry(const LeaderboardEntry& entry)
+	{
+		m_Entries.push_back(entry);
+
+		Impl_OpenFile(MWR_WRITE_HANDLE);
+		Impl_UpdateFile();
+		Impl_CloseFile(MWR_WRITE_HANDLE);
+	}
+
+	bool Leaderboard::Impl_OpenFile(bool isForWriting)
+	{
+		if ((m_Read != INVALID_HANDLE_VALUE && !isForWriting) || (m_Write != INVALID_HANDLE_VALUE && isForWriting))
+		{
+			Message("Leaderboard.CreateFileA: already opened!");
+			return false;
+		}
+
+		if (isForWriting)
+			m_Write = CreateFileA(m_FilePath.c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, nullptr);
+		else
+			m_Read = CreateFileA(m_FilePath.c_str(), GENERIC_READ, 0, 0, OPEN_ALWAYS, 0, nullptr);
+
+		MsgIfError("Leaderboard.CreateFileA");
+
+		return true;
+	}
+
+	bool Leaderboard::Impl_UpdateFile()
+	{
+		if (m_Write == INVALID_HANDLE_VALUE)
+		{
+			Message("Leaderboard.Impl_UpdateFile: file's not open!");
+			return false;
+		}
+
+		WriteFile(m_Write, m_Entries.data(), sizeof(LeaderboardEntry) * m_Entries.size(), 0, nullptr);
+		MsgIfError("Leaderboard.WriteFile");
+
+		return true;
+	}
+
+	bool Leaderboard::Impl_ReadFromFile()
+	{
+		if (m_Read == INVALID_HANDLE_VALUE)
+		{
+			Message("Leaderboard.Impl_ReadFromFile: file's not open!");
+			return false;
+		}
+
+		const DWORD fileSize = GetFileSize(m_Read, 0);
+		const size_t elements = fileSize / sizeof(LeaderboardEntry);
+		m_Entries.resize(elements);
+		m_Entries.reserve(elements + 1);
+
+		BOOL success = ReadFile(m_Read, m_Entries.data(), fileSize, nullptr, nullptr);
+		if (success == FALSE)
+		{
+			Message("Leaderboard.ReadFile: couldn't read from file!");
+			MsgIfError("Leaderboard.ReadFile");
+			return false;
+		}
+		else
+		{
+			MsgIfError("Leaderboard.ReadFile");
+		}
+
+		return true;
+	}
+
+	bool Leaderboard::Impl_CloseFile(bool isForWriting)
+	{
+		BOOL closed = CloseHandle(isForWriting ? m_Write : m_Read);
+		MsgIfError("Leaderboard.CloseHandle");
+
+		if (isForWriting)
+			m_Write = INVALID_HANDLE_VALUE;
+		else
+			m_Read = INVALID_HANDLE_VALUE;
+
+		return closed;
+	}
+
+	Date::Date(std::uint32_t year, std::uint32_t month, std::uint32_t day, std::uint32_t hour, std::uint32_t minute, std::uint32_t second)
+		: Year(year), Month(month), Day(day), Hour(hour), Minute(minute), Second(second)
+	{
+
+	}
+
+	std::string Date::GetDateFormat(const std::string& format)
+	{
+		std::string finalFormat;
+
+		for (char c : format)
+		{
+			switch (c)
+			{
+				case 'Y':
+				{
+					finalFormat += std::to_string(Year);
+				} break;
+
+				case 'M':
+				{
+					finalFormat += std::to_string(Month);
+				} break;
+
+				case 'D':
+				{
+					finalFormat += std::to_string(Day);
+				} break;
+
+				case 'h':
+				{
+					finalFormat += std::to_string(Hour);
+				} break;
+
+				case 'm':
+				{
+					finalFormat += std::to_string(Minute);
+				} break;
+
+				case 's':
+				{
+					finalFormat += std::to_string(Second);
+				} break;
+
+				default:
+				{
+					finalFormat += c;
+				} break;
+			}
+		}
+
+		return finalFormat;
+	}
+
+	LeaderboardEntry::LeaderboardEntry(const std::string& player, Date timestamp, std::uint32_t time, std::uint32_t flagsUsed, const std::string& difficultyName)
+		: Player(player), DifficultyName(difficultyName), Timestamp(timestamp), Time(time), FlagsUsed(flagsUsed)
+	{
+
+	}
+
 }
 
 #ifdef _DEBUG
-static std::int64_t s_memoryUse;
+static std::int64_t s_MemoryUse;
 void* operator new(size_t size)
 {
 	void* address = malloc(size);
-	s_memoryUse += size;
+	s_MemoryUse += size;
 
 	return address;
 }
 
 void operator delete(void* ptr, size_t size)
 {
-	s_memoryUse -= size;
+	s_MemoryUse -= size;
 
 	free(ptr);
 }
