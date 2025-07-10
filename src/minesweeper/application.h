@@ -89,13 +89,12 @@ namespace mwr
 
 	struct LeaderboardEntry
 	{
-		LeaderboardEntry(const std::string& player, Date timestamp, std::uint32_t time, std::uint32_t flagsUsed, const std::string& difficultyName);
+		LeaderboardEntry(const std::string& player, Date timestamp, std::uint32_t time, const std::string& difficultyName);
 		LeaderboardEntry() = default;
 
 		std::string Player, DifficultyName;
 		Date Timestamp;
 		std::uint32_t Time;
-		std::uint32_t FlagsUsed;
 	};
 
 #define MWR_WRITE_HANDLE true

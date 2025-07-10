@@ -420,13 +420,20 @@ namespace mwr
 			Label* title = difficultyScene->CreateControl<Label>(Vec2i(400, 67), Vec2i(150, 30), L"High Scores", &window, &large);
 
 			std::vector<Button*> scoreList = {};
-			for (std::int32_t i = 0; i < 8; i++)
+			for (std::int32_t i = 0; i < 11; i++)
 			{
-				Button* button = highScoresScene->CreateControl<Button>(Vec2i(200, 40), Vec2i(250, i * 50 + 120), std::to_wstring(i).c_str(), &window, &cascadia);
+				// First go headers, but are placed here because of convenience.
+
+				const std::int32_t yPos = (i == 0 ? 110 : 130) + i * 35;
+
+				Label* Name = highScoresScene->CreateControl<Label>(Vec2(170, 30), Vec2(45, yPos), L"Name", &window, &cascadia);
+				Label* Difficulty = highScoresScene->CreateControl<Label>(Vec2i(120, 30), Vec2i(220, yPos), L"Difficulty", &window, &cascadia);
+				Label* Time = highScoresScene->CreateControl<Label>(Vec2i(80, 30), Vec2i(345, yPos), L"Time", &window, &cascadia);
+				Label* Date = highScoresScene->CreateControl<Label>(Vec2i(200, 30), Vec2i(430, yPos), L"Date", &window, &cascadia);
 			}
 
-			Button* up = highScoresScene->CreateControl<Button>(Vec2i(60, 50), Vec2i(600, 150), { L'\u02C4', L'\0'}, &window, &cascadia);
-			Button* down = highScoresScene->CreateControl<Button>(Vec2i(60, 50), Vec2i(600, 210), { L'\u02C5', L'\0'}, &window, &cascadia);
+			Button* up = highScoresScene->CreateControl<Button>(Vec2i(30, 20), Vec2i(640, 165), { L'\u02C4', L'\0'}, &window, &cascadia);
+			Button* down = highScoresScene->CreateControl<Button>(Vec2i(30, 20), Vec2i(640, 195), { L'\u02C5', L'\0'}, &window, &cascadia);
 
 			Button* back = highScoresScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 540), L"Back", &window, &cascadia);
 			back->AddHook(EventType::Click, Hook("Back.Click", [&](const std::any& param)
@@ -702,8 +709,8 @@ namespace mwr
 		return finalFormat;
 	}
 
-	LeaderboardEntry::LeaderboardEntry(const std::string& player, Date timestamp, std::uint32_t time, std::uint32_t flagsUsed, const std::string& difficultyName)
-		: Player(player), DifficultyName(difficultyName), Timestamp(timestamp), Time(time), FlagsUsed(flagsUsed)
+	LeaderboardEntry::LeaderboardEntry(const std::string& player, Date timestamp, std::uint32_t time, const std::string& difficultyName)
+		: Player(player), DifficultyName(difficultyName), Timestamp(timestamp), Time(time)
 	{
 
 	}
