@@ -10,6 +10,7 @@
 // Minesweeper
 #include <minesweeper/error.h>
 #include <minesweeper/implementation.h>
+#include <minesweeper/base_class.h>
 
 namespace mwr
 {
@@ -23,7 +24,7 @@ namespace mwr
 		StrikeOut = 8
 	};
 
-	class Font : public EventActive
+	class Font : public BaseClass
 	{
 	public:
 		friend class Control;

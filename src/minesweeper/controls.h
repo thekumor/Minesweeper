@@ -22,6 +22,7 @@ namespace mwr
 	public:
 		friend class Label;
 		friend class Button;
+		friend class TextEntry;
 
 		Control(const Vec2i& size, const Vec2i& position, const std::wstring& string, Control* parent = nullptr, Font* font = nullptr);
 		Control(const Control&& other);
@@ -35,6 +36,7 @@ namespace mwr
 		const std::wstring& GetString() const;
 		const std::string& GetTag() const;
 		bool IsDisabled() const;
+		bool IsInvalidated() const;
 		void SetPosition(const Vec2i& position, bool isScreen = false);
 		void SetSize(const Vec2i& size, bool isScreen = false);
 		void SetString(const std::wstring& string);
@@ -42,9 +44,11 @@ namespace mwr
 		void SetParent(Control* parent);
 		void SetFont(Font* font);
 		void SetDisabled(bool disabled);
+		void Invalidate(bool invalidate = true);
 
 	protected:
 		bool m_Disabled;
+		bool m_Invalidated;
 		Control* m_Parent;
 		Font* m_Font;
 		HWND m_Handle;
@@ -67,6 +71,13 @@ namespace mwr
 	public:
 		Button(const Vec2i& size, const Vec2i& position, const std::wstring& string, Control* parent = nullptr, Font* font = nullptr);
 		Button() = default;
+	};
+
+	class TextEntry : public Control
+	{
+	public:
+		TextEntry(const Vec2i& size, const Vec2i& position, const std::wstring& string, Control* parent = nullptr, Font* font = nullptr);
+		TextEntry() = default;
 	};
 
 }

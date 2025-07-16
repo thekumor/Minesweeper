@@ -76,7 +76,7 @@ namespace mwr
 		field->SetTag(newTag);
 	}
 
-	static struct FieldNeighbors
+	struct FieldNeighbors
 	{
 		std::int32_t up, down, left, right, leftUp, leftDown, rightUp, rightDown;
 	};
@@ -129,8 +129,11 @@ namespace mwr
 
 	int Application::Run()
 	{
+		Leaderboard leaderboard("high_scores.bin");
+
 		Window& window = m_MainWindow;
 		Font cascadia(L"Cascadia Code", 24, FontStyle::Normal);
+		Font cascadiaSmaller(L"Cascadia Code", 20, FontStyle::Normal);
 		Font large(L"Georgia", 64, FontStyle::Bold);
 		Font smol(L"Arial", 16);
 		Font webdings(L"Webdings", 24);
@@ -141,6 +144,7 @@ namespace mwr
 			Vec2i minefieldSize;
 			std::int32_t time, totalBombs, totalFlags;
 			float sweepForce;
+			std::wstring name;
 		};
 
 		Specification easySpec;
@@ -149,6 +153,7 @@ namespace mwr
 		easySpec.totalBombs = 3;
 		easySpec.totalFlags = 5;
 		easySpec.sweepForce = 2.0f;
+		easySpec.name = L"Easy";
 
 		Specification normalSpec;
 		normalSpec.minefieldSize = { 15, 15 };
@@ -156,6 +161,7 @@ namespace mwr
 		normalSpec.totalBombs = 12;
 		normalSpec.totalFlags = 14;
 		normalSpec.sweepForce = 3.0f;
+		normalSpec.name = L"Normal";
 
 		Specification hardSpec;
 		hardSpec.minefieldSize = { 20, 20 };
@@ -163,6 +169,7 @@ namespace mwr
 		hardSpec.totalBombs = 28;
 		hardSpec.totalFlags = 30;
 		hardSpec.sweepForce = 3.0f;
+		hardSpec.name = L"Hard";
 
 		Specification hellSpec;
 		hellSpec.minefieldSize = { 35, 25 };
@@ -170,8 +177,11 @@ namespace mwr
 		hellSpec.totalBombs = 64;
 		hellSpec.totalFlags = 64;
 		hellSpec.sweepForce = 2.0f;
+		hellSpec.name = L"Hell";
 
-		Specification* currentSpec = nullptr;
+		// This can be set to nullptr. Setting it to something else is useful for debugging
+		// Can be just done here, doesn't affect program's behavior.
+		Specification* currentSpec = &easySpec;
 
 		Scene* difficultyScene = CreateScene("Difficulty Scene");
 		Scene* minefieldScene = CreateScene("Minefield Scene");
@@ -415,31 +425,129 @@ namespace mwr
 			}));
 		}));
 
+		std::int32_t pos = 0;
 		highScoresScene->AddHook(EventType::SceneOpen, Hook("highScoresScene.Open", [&](const std::any& param)
 		{
-			Label* title = difficultyScene->CreateControl<Label>(Vec2i(400, 67), Vec2i(150, 30), L"High Scores", &window, &large);
+			Label* title = highScoresScene->CreateControl<Label>(Vec2i(400, 67), Vec2i(150, 30), L"High Scores", &window, &large);
+			
+			// We get entries from leaderboard.
+			const std::vector<LeaderboardEntry>& defaultEntries = leaderboard.GetEntries();
 
-			std::vector<Button*> scoreList = {};
-			for (std::int32_t i = 0; i < 11; i++)
+			// We create our own vector here so that we can sort it
+			std::vector<LeaderboardEntry> entries;
+			for (auto& k : defaultEntries)
+				entries.push_back(k);
+
+			// We sort our high scores by time.
+			std::sort(entries.begin(), entries.end());
+
+			std::vector<std::array<Label*, 5>> scoreList = {};
+			for (std::int32_t i = 0; i < 16; i++)
 			{
 				// First go headers, but are placed here because of convenience.
 
-				const std::int32_t yPos = (i == 0 ? 110 : 130) + i * 35;
+				const std::int32_t yPos = (i == 0 ? 110 : 130) + i * 25;
+				const std::int32_t ySize = i == 0 ? 30 : 23;
 
-				Label* Name = highScoresScene->CreateControl<Label>(Vec2(170, 30), Vec2(45, yPos), L"Name", &window, &cascadia);
-				Label* Difficulty = highScoresScene->CreateControl<Label>(Vec2i(120, 30), Vec2i(220, yPos), L"Difficulty", &window, &cascadia);
-				Label* Time = highScoresScene->CreateControl<Label>(Vec2i(80, 30), Vec2i(345, yPos), L"Time", &window, &cascadia);
-				Label* Date = highScoresScene->CreateControl<Label>(Vec2i(200, 30), Vec2i(430, yPos), L"Date", &window, &cascadia);
+				// They're either a header or empty. Eventually, the empty ones will be filled.
+				std::wstring entryPos(i == 0 ? L"#" : std::to_wstring(i));
+				std::wstring entryName(i == 0 ? L"Name" : L"");
+				std::wstring entryDifficulty(i == 0 ? L"Difficulty" : L"");
+				std::wstring entryTime(i == 0 ? L"Time" : L"");
+				std::wstring entryDate(i == 0 ? L"Date" : L"");
+
+				if (i != 0 && entries.size() > i - 1)
+				{
+					const LeaderboardEntry& entry = entries[i - 1];
+					entryName = entry.Player;
+					entryDifficulty = entry.DifficultyName;
+					entryTime = FormatTime(entry.Time);
+					entryDate = entry.Timestamp.GetDateFormat(L"Y-0M-0D 0h:0m:0s");
+				}
+
+				// Cascadia for headers, Cascadia's smaller variant for entries.
+				Font* const font = i == 0 ? &cascadia : &cascadiaSmaller;
+
+				Label* position = highScoresScene->CreateControl<Label>(Vec2(45, ySize), Vec2(20, yPos), entryPos, &window, font);
+				Label* name = highScoresScene->CreateControl<Label>(Vec2(170, ySize), Vec2(70, yPos), entryName, &window, font);
+				Label* difficulty = highScoresScene->CreateControl<Label>(Vec2i(120, ySize), Vec2i(245, yPos), entryDifficulty, &window, font);
+				Label* time = highScoresScene->CreateControl<Label>(Vec2i(80, ySize), Vec2i(370, yPos), entryTime, &window, font);
+				Label* date = highScoresScene->CreateControl<Label>(Vec2i(200, ySize), Vec2i(455, yPos), entryDate, &window, font);
+
+				// Insert them because we need to modify the list in case user clicks up/down buttons.
+				if (i != 0)
+				{
+					std::array<Label*, 5> scoreEntry = { position, name, difficulty, time, date };
+					scoreList.push_back(scoreEntry);
+				}
 			}
 
-			Button* up = highScoresScene->CreateControl<Button>(Vec2i(30, 20), Vec2i(640, 165), { L'\u02C4', L'\0'}, &window, &cascadia);
-			Button* down = highScoresScene->CreateControl<Button>(Vec2i(30, 20), Vec2i(640, 195), { L'\u02C5', L'\0'}, &window, &cascadia);
+			Button* up = highScoresScene->CreateControl<Button>(Vec2i(30, 25), Vec2i(500, 550), { L'\u02C4', L'\0'}, &window, &cascadia);
+			up->AddHook(EventType::Click, Hook("Up.Click", [=, &pos](const std::any& param)
+			{
+				if (pos == 0) return;
+				pos--;
 
-			Button* back = highScoresScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 540), L"Back", &window, &cascadia);
+				for (std::int32_t i = 0; i < 15; i++)
+				{
+					OutputDebugStringA(std::string(std::to_string(i + pos) + "\n").c_str());
+
+					const std::array<Label*, 5> arr = scoreList[i];
+					Label* position = arr[0];
+					Label* name = arr[1];
+					Label* difficulty = arr[2];
+					Label* time = arr[3];
+					Label* date = arr[4];
+
+					LeaderboardEntry entry = leaderboard.GetEntries()[i + pos];
+
+					// Update values
+					position->SetString(std::to_wstring(std::stoi(position->GetString()) - 1));
+					name->SetString(entry.Player);
+					difficulty->SetString(entry.DifficultyName);
+					time->SetString(FormatTime(entry.Time));
+					date->SetString(entry.Timestamp.GetDateFormat(L"Y-M-D h:m:s"));
+				}
+			}));
+
+			Button* down = highScoresScene->CreateControl<Button>(Vec2i(30, 25), Vec2i(500, 585), { L'\u02C5', L'\0'}, &window, &cascadia);
+			down->AddHook(EventType::Click, Hook("Down.Click", [=, &pos](const std::any& param)
+			{
+				if (pos >= leaderboard.GetEntries().size() - 15) return;
+				pos++;
+
+				for (std::int32_t i = 0; i < 15; i++)
+				{
+					const std::array<Label*, 5> arr = scoreList[i];
+					Label* position = arr[0];
+					Label* name = arr[1];
+					Label* difficulty = arr[2];
+					Label* time = arr[3];
+					Label* date = arr[4];
+
+					LeaderboardEntry entry = leaderboard.GetEntries()[i + pos];
+
+					// Update values
+					position->SetString(std::to_wstring(std::stoi(position->GetString()) + 1));
+					name->SetString(entry.Player);
+					difficulty->SetString(entry.DifficultyName);
+					time->SetString(FormatTime(entry.Time));
+					date->SetString(entry.Timestamp.GetDateFormat(L"Y-M-D h:m:s"));
+				}
+			}));
+
+			Button* back = highScoresScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 550), L"Back", &window, &cascadia);
 			back->AddHook(EventType::Click, Hook("Back.Click", [&](const std::any& param)
 			{
+				pos = 0;
 				SwitchScene(difficultyScene);
 			}));
+
+			if (leaderboard.GetEntries().size() < 16)
+			{
+				up->SetDisabled(true);
+				down->SetDisabled(true);
+			}
 		}));
 
 		loseScene->AddHook(EventType::SceneOpen, Hook("loseScene.Open", [&](const std::any& param)
@@ -455,9 +563,22 @@ namespace mwr
 		winScene->AddHook(EventType::SceneOpen, Hook("winScene.Open", [&](const std::any& param)
 		{
 			Label* title = winScene->CreateControl<Label>(Vec2i(280, 67), Vec2i(200, 30), L"You won!", &window, &large);
-			Button* back = winScene->CreateControl<Button>(Vec2i(200, 60), Vec2i(250, 200), L"Return to menu", &window, &cascadia);
-			back->AddHook(EventType::Click, Hook("Back.Click", [&](const std::any& param)
+			Label* playerTime = winScene->CreateControl<Label>(Vec2i(210, 30), Vec2i(213, 130), L"Your time: " + FormatTime(currentSpec->time - game.secondsLeft), &window, &cascadia);
+			Label* entryInfo = winScene->CreateControl<Label>(Vec2i(130, 20), Vec2i(213, 177), L"Enter your name: ", &window, &smol);
+			TextEntry* entry = winScene->CreateControl<TextEntry>(Vec2i(260, 30), Vec2i(213, 210), L"Player", &window, &cascadia);
+
+			Button* back = winScene->CreateControl<Button>(Vec2i(190, 60), Vec2i(250, 270), L"Save and return", &window, &cascadia);
+			back->AddHook(EventType::Click, Hook("Back.Click", [=, &leaderboard](const std::any& param)
 			{
+				SYSTEMTIME sysTime;
+				//GetSystemTime(&sysTime);
+				GetLocalTime(&sysTime);
+
+				Date date(sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour, sysTime.wMinute, sysTime.wSecond);
+				std::int32_t time = currentSpec->time - game.secondsLeft;
+				const wchar_t* difficulty = currentSpec->name.c_str();
+
+				leaderboard.AddEntry(LeaderboardEntry(entry->GetString().c_str(), date, time, difficulty));
 				SwitchScene(difficultyScene);
 			}));
 		}));
@@ -506,9 +627,9 @@ namespace mwr
 		}
 	}
 
-	void Application::OpenScene(Scene* scene)
+	void Application::OpenScene(Scene* scene, const std::any& param)
 	{
-		g_Dispatcher.CallEventQualifier(EventType::SceneOpen, scene);
+		g_Dispatcher.CallEventQualifier(EventType::SceneOpen, scene, param);
 		m_CurrentScene = scene;
 	}
 
@@ -518,11 +639,11 @@ namespace mwr
 		m_CurrentScene = nullptr;
 	}
 
-	void Application::SwitchScene(Scene* scene)
+	void Application::SwitchScene(Scene* scene, const std::any& param)
 	{
 		CloseScene(m_CurrentScene);
 		m_MainWindow.SetSize(Vec2i(MWR_WIDTH, MWR_HEIGHT));
-		OpenScene(scene);
+		OpenScene(scene, param);
 	}
 
 	Scene::Scene(const std::string& name) : BaseClass(true),
@@ -552,6 +673,8 @@ namespace mwr
 		for (auto& k : m_Controls)
 			if (k->GetTag() == tag)
 				return k;
+
+		return nullptr;
 	}
 
 	Leaderboard::Leaderboard(const std::string& filePath)
@@ -608,7 +731,8 @@ namespace mwr
 			return false;
 		}
 
-		WriteFile(m_Write, m_Entries.data(), sizeof(LeaderboardEntry) * m_Entries.size(), 0, nullptr);
+		DWORD size = (sizeof(LeaderboardEntry) * m_Entries.size());
+		WriteFile(m_Write, m_Entries.data(), size, 0, nullptr);
 		MsgIfError("Leaderboard.WriteFile");
 
 		return true;
@@ -661,42 +785,78 @@ namespace mwr
 
 	}
 
-	std::string Date::GetDateFormat(const std::string& format)
+	std::wstring Date::GetDateFormat(const std::wstring& format) const
 	{
-		std::string finalFormat;
+		std::wstring finalFormat;
+		bool doZero = false;
 
-		for (char c : format)
+		for (wchar_t c : format)
 		{
 			switch (c)
 			{
 				case 'Y':
 				{
-					finalFormat += std::to_string(Year);
+					finalFormat += std::to_wstring(Year);
 				} break;
 
 				case 'M':
 				{
-					finalFormat += std::to_string(Month);
+					if (doZero && Month < 10)
+					{
+						finalFormat += L"0";
+						doZero = false;
+					}
+
+					finalFormat += std::to_wstring(Month);
 				} break;
 
 				case 'D':
 				{
-					finalFormat += std::to_string(Day);
+					if (doZero && Day < 10)
+					{
+						finalFormat += L"0";
+						doZero = false;
+					}
+
+					finalFormat += std::to_wstring(Day);
 				} break;
 
 				case 'h':
 				{
-					finalFormat += std::to_string(Hour);
+					if (doZero && Hour < 10)
+					{
+						finalFormat += L"0";
+						doZero = false;
+					}
+
+					finalFormat += std::to_wstring(Hour);
 				} break;
 
 				case 'm':
 				{
-					finalFormat += std::to_string(Minute);
+					if (doZero && Minute < 10)
+					{
+						finalFormat += L"0";
+						doZero = false;
+					}
+
+					finalFormat += std::to_wstring(Minute);
 				} break;
 
 				case 's':
 				{
-					finalFormat += std::to_string(Second);
+					if (doZero && Second < 10)
+					{
+						finalFormat += L"0";
+						doZero = false;
+					}
+
+					finalFormat += std::to_wstring(Second);
+				} break;
+
+				case '0':
+				{
+					doZero = true;
 				} break;
 
 				default:
@@ -709,15 +869,34 @@ namespace mwr
 		return finalFormat;
 	}
 
-	LeaderboardEntry::LeaderboardEntry(const std::string& player, Date timestamp, std::uint32_t time, const std::string& difficultyName)
-		: Player(player), DifficultyName(difficultyName), Timestamp(timestamp), Time(time)
+	LeaderboardEntry::LeaderboardEntry(const wchar_t* player, Date timestamp, std::uint32_t time, const wchar_t* difficultyName)
+		: Timestamp(timestamp), Time(time)
 	{
+		if (wcslen(player) < 24)
+			wcscpy(Player, player);
+		else
+		{
+			Player[0] = L'?';
+			Player[1] = L'\0';
+		}
 
+		if (wcslen(difficultyName) < 24)
+			wcscpy(DifficultyName, difficultyName);
+		else
+		{
+			DifficultyName[0] = L'?';
+			DifficultyName[1] = L'\0';
+		}
+	}
+
+	bool LeaderboardEntry::operator<(const LeaderboardEntry& other) const
+	{
+		return Time < other.Time;
 	}
 
 }
 
-#ifdef _DEBUG
+#if MWR_MEMORY_ALLOCS
 static std::int64_t s_MemoryUse;
 void* operator new(size_t size)
 {

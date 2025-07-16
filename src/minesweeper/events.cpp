@@ -54,6 +54,18 @@ namespace mwr
 		}
 	}
 
+	void EventDispatcher::RemoveListenerForce(EventListener* listener)
+	{
+		for (std::vector<Handle<EventListener>>::iterator it = m_Listeners.begin(); it != m_Listeners.end(); it++)
+		{
+			if (**it == listener)
+			{
+				m_Listeners.erase(it);
+				return;
+			}
+		}
+	}
+
 	void EventDispatcher::CallEvent(EventType type, const std::any& data)
 	{
 		for (auto& k : m_Listeners)

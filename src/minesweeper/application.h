@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include <cmath>
 #include <fstream>
+#include <array>
+#include <algorithm>
 
 // WinAPI
 #include <windows.h>
@@ -19,7 +21,9 @@
 #include <minesweeper/timer.h>
 #include <minesweeper/events.h>
 
-#ifdef _DEBUG
+#define MWR_MEMORY_ALLOCS 0
+
+#if MWR_MEMORY_ALLOCS
 void* operator new(size_t size);
 void operator delete(void* ptr, size_t size);
 #endif
@@ -41,9 +45,9 @@ namespace mwr
 		Scene* CreateScene(const std::string& name);
 		Timer* CreateTimer(std::int32_t delay);
 		void DestroyTimer(Timer* ptr);
-		void OpenScene(Scene* scene);
+		void OpenScene(Scene* scene, const std::any& param = MWR_NODATA);
 		void CloseScene(Scene* scene);
-		void SwitchScene(Scene* scene);
+		void SwitchScene(Scene* scene, const std::any& param = MWR_NODATA);
 
 	private:
 		Window m_MainWindow;
@@ -82,17 +86,20 @@ namespace mwr
 	{
 		Date(std::uint32_t year, std::uint32_t month, std::uint32_t day, std::uint32_t hour, std::uint32_t minute, std::uint32_t second);
 		Date() = default;
-		std::string GetDateFormat(const std::string& format);
+		std::wstring GetDateFormat(const std::wstring& format) const;
 
 		std::uint32_t Year, Month, Day, Hour, Minute, Second;
 	};
 
 	struct LeaderboardEntry
 	{
-		LeaderboardEntry(const std::string& player, Date timestamp, std::uint32_t time, const std::string& difficultyName);
+		LeaderboardEntry(const wchar_t* player, Date timestamp, std::uint32_t time, const wchar_t* difficultyName);
 		LeaderboardEntry() = default;
 
-		std::string Player, DifficultyName;
+		bool operator<(const LeaderboardEntry& other) const;
+
+		wchar_t Player[24];
+		wchar_t DifficultyName[24];
 		Date Timestamp;
 		std::uint32_t Time;
 	};

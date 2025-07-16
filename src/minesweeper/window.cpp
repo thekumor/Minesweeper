@@ -36,6 +36,8 @@ namespace mwr
 		);
 		MsgIfError("Window.m_Handle");
 
+		SetWindowLong(m_Handle, GWL_STYLE, GetWindowLong(m_Handle, GWL_STYLE) & ~WS_MAXIMIZEBOX);
+
 		ShowWindow(m_Handle, SW_SHOW);
 		UpdateWindow(m_Handle);
 
@@ -76,6 +78,7 @@ namespace mwr
 				PAINTSTRUCT ps;
 				HDC hdc = BeginPaint(handle, &ps);
 
+				// Just a color fill, nothing fancy
 				FillRect(hdc, &ps.rcPaint, reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1));
 
 				EndPaint(handle, &ps);
@@ -95,7 +98,11 @@ namespace mwr
 			case WM_COMMAND:
 			{
 				void* qualifier = reinterpret_cast<void*>(lp);
-				g_Dispatcher.CallEventQualifier(EventType::Click, qualifier);
+
+				if (HIWORD(wp) == EN_CHANGE) // Edit box text entered
+					g_Dispatcher.CallEventQualifier(EventType::TextEntered, qualifier);
+				else // Just a mouse button click
+					g_Dispatcher.CallEventQualifier(EventType::Click, qualifier);
 			} break;
 
 			case WM_CONTEXTMENU:
@@ -108,6 +115,8 @@ namespace mwr
 			{
 				g_Dispatcher.CallEventQualifier(EventType::TimerClock, reinterpret_cast<void*>(wp));
 			} break;
+
+
 		}
 
 		return DefWindowProcW(handle, msg, wp, lp);
@@ -125,6 +134,8 @@ namespace mwr
 	{
 		Control::SetSize(size, isScreen);
 		g_WindowSizes[m_Handle] = size;
+
+		HandleResizing(m_Handle, 0, 0, 0);
 	}
 
 	Vec2i Window::GetRealSizeDifference(HWND handle)

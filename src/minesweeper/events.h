@@ -26,10 +26,13 @@ namespace mwr
 		Close,
 		StartUp,
 		Click,
+		TextEntered,
 		SceneOpen,
 		SceneClose,
 		TimerClock,
 		RightClick,
+		FontsUpdated,
+		ControlDestroyed,
 	};
 
 	using EventCallback = std::function<void(const std::any&)>;
@@ -72,6 +75,7 @@ namespace mwr
 		void AddListener(EventListener* listener);
 		void AddListenerForce(EventListener* listener);
 		void RemoveListener(EventListener* listener);
+		void RemoveListenerForce(EventListener* listener);
 		void CallEvent(EventType type, const std::any& data = MWR_NODATA);
 		void CallEventQualifier(EventType type, void* qualifier, const std::any& data = MWR_NODATA);
 		void RemoveInvalidListeners();

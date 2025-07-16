@@ -4,7 +4,7 @@ namespace mwr
 {
 
 	Control::Control(const Vec2i& size, const Vec2i& position, const std::wstring& string, Control* parent, Font* font)
-		: m_Parent(parent), m_Font(font), m_Handle(nullptr), m_Size(size), m_Position(position), m_String(string),
+		: m_Parent(parent), m_Font(nullptr), m_Handle(nullptr), m_Size(size), m_Position(position), m_String(string),
 		m_ScreenSize(size), m_ScreenPosition(position), m_Disabled(false)
 	{
 		if (parent)
@@ -20,6 +20,13 @@ namespace mwr
 
 				SetPosition(newControlPos, true);
 				SetSize(newControlSize, true);
+			}));
+
+			m_Listener.AddHook(EventType::FontsUpdated, Hook("Control.DefaultFontsUpdated", [&](const std::any& param)
+			{
+				// Font's handle is changed, but object stays the same. Easiest way is to just set font to its own again
+				// so that font is updated properly.
+				SetFont(m_Font);
 			}));
 		}
 
@@ -38,6 +45,7 @@ namespace mwr
 
 	Control::~Control()
 	{
+		g_Dispatcher.CallEvent(EventType::ControlDestroyed, &m_Listener);
 		DestroyWindow(m_Handle);
 	}
 
@@ -54,6 +62,11 @@ namespace mwr
 	bool Control::IsDisabled() const
 	{
 		return m_Disabled;
+	}
+
+	bool Control::IsInvalidated() const
+	{
+		return m_Invalidated;
 	}
 
 	Vec2i Control::GetSize(HWND handle)
@@ -118,8 +131,25 @@ namespace mwr
 
 	void Control::SetFont(Font* font)
 	{
+		if (!font)
+			return;
+
+		if (m_Font != font)
+		{
+			font->GetDispatcher().AddListenerForce(&m_Listener);
+
+			if (m_Font)
+				m_Font->GetDispatcher().RemoveListenerForce(&m_Listener);
+		}
+
 		SendMessageW(m_Handle, WM_SETFONT, reinterpret_cast<WPARAM>(font->m_Handle), TRUE);
 		MsgIfError("Control.SendMessageW");
+
+		// Mark itself to be repainted.
+		RECT rect;
+		GetClientRect(m_Handle, &rect);
+		InvalidateRect(m_Handle, &rect, TRUE);
+
 		m_Font = font;
 	}
 
@@ -127,6 +157,11 @@ namespace mwr
 	{
 		m_Disabled = disabled;
 		EnableWindow(m_Handle, !disabled);
+	}
+
+	void Control::Invalidate(bool invalidate)
+	{
+		m_Invalidated = invalidate;
 	}
 
 	Label::Label(const Vec2i& size, const Vec2i& position, const std::wstring& string, Control* parent, Font* font)
@@ -177,6 +212,41 @@ namespace mwr
 
 		if (font)
 			SetFont(font);
+	}
+
+	TextEntry::TextEntry(const Vec2i& size, const Vec2i& position, const std::wstring& string, Control* parent, Font* font)
+		: Control(size, position, string, parent, font)
+	{
+		m_Handle = CreateWindowW(
+			L"Edit",
+			string.c_str(),
+			(parent ? WS_CHILD : 0) | WS_BORDER,
+			position.x,
+			position.y,
+			size.x,
+			size.y,
+			parent ? parent->m_Handle : nullptr,
+			nullptr,
+			GetModuleHandleW(0),
+			0
+		);
+		MsgIfError("Button.m_Handle");
+		m_Listener.SetQualifier(static_cast<void*>(m_Handle));
+
+		ShowWindow(m_Handle, SW_SHOW);
+
+		if (font)
+			SetFont(font);
+
+		m_Listener.AddHook(EventType::TextEntered, Hook("TextEntry.DefaultTextEntered", [&](const std::any& param)
+		{
+			std::int32_t length = GetWindowTextLengthW(m_Handle) + 1;
+			wchar_t* text = (wchar_t*)alloca(sizeof(wchar_t) * length);
+
+			GetWindowTextW(m_Handle, text, length);
+
+			m_String = text;
+		}));
 	}
 
 }
