@@ -237,6 +237,7 @@ namespace mwr
 
 		Timer* roundClock;
 
+		bool lost = false;
 		minefieldScene->AddHook(EventType::SceneOpen, Hook("minefieldScene.Open", [&](const std::any& param)
 		{
 			roundClock = CreateTimer(1000);
@@ -257,6 +258,7 @@ namespace mwr
 			back->AddHook(EventType::Click, Hook("back.Click", [&](const std::any& param)
 			{
 				DestroyTimer(roundClock);
+				roundClock = nullptr;
 				SwitchScene(difficultyScene);
 			}));
 
@@ -311,12 +313,17 @@ namespace mwr
 				FieldSetHasBomb(field, containsBomb);
 				FieldSetHasFlag(field, false);
 
-				field->AddHook(EventType::Click, Hook("field.Click", [=, &wingdings, &cascadia](const std::any& param)
+				field->AddHook(EventType::Click, Hook("field.Click", [=, &wingdings, &cascadia, &lost, &roundClock, &game](const std::any& param)
 				{
+					if (lost) return;
+
 					if (FieldHasBomb(field))
 					{
+						lost = true;
+
 						back->RemoveHook(EventType::Click, "back.Click");
 						DestroyTimer(roundClock);
+						roundClock = nullptr;
 
 						for (std::int32_t j : bombIndexes)
 						{
@@ -325,8 +332,10 @@ namespace mwr
 						}
 
 						Timer* delay = CreateTimer(5000);
-						delay->AddHook(EventType::TimerClock, Hook("delay.TimerClock", [=](const std::any& param)
+						delay->AddHook(EventType::TimerClock, Hook("delay.TimerClock", [=, &lost](const std::any& param)
 						{
+							lost = false;
+
 							SwitchScene(loseScene);
 							DestroyTimer(delay);
 						}));
@@ -347,11 +356,20 @@ namespace mwr
 							}
 							else
 								btn->SetPosition(Vec2i(-100, -100));
+
+							if (FieldHasFlag(btn))
+							{
+								FieldSetHasFlag(btn, false);
+								game.flagsLeft++;
+
+								// Update the flag counter.
+								flags->SetString(std::wstring(std::wstring(L"Flags left: ") + std::to_wstring(game.flagsLeft)));
+							}
 						}
 					}
 				}));
 
-				field->AddHook(EventType::RightClick, Hook("field.RightClick", [=, &game, &cascadia, &wingdings](const std::any& param)
+				field->AddHook(EventType::RightClick, Hook("field.RightClick", [=, &game, &cascadia, &wingdings, &roundClock](const std::any& param)
 				{
 					// Already has a flag - remove it.
 					if (FieldHasFlag(field))
@@ -381,6 +399,7 @@ namespace mwr
 						if (flaggedMines == currentSpec->totalBombs)
 						{
 							DestroyTimer(roundClock);
+							roundClock = nullptr;
 							SwitchScene(winScene);
 							return;
 						}
@@ -409,7 +428,7 @@ namespace mwr
 				if (neighbors.rightDown != -1) adjacentBombs->at(neighbors.rightDown)++;
 			}
 
-			roundClock->AddHook(EventType::TimerClock, Hook("roundClock.TimerClock", [=, &game](const std::any& param)
+			roundClock->AddHook(EventType::TimerClock, Hook("roundClock.TimerClock", [=, &game, &roundClock](const std::any& param)
 			{
 				game.secondsLeft--;
 				game.formattedTimeLeft = FormatTime(game.secondsLeft);
@@ -418,6 +437,7 @@ namespace mwr
 				{
 					SwitchScene(loseScene);
 					DestroyTimer(roundClock);
+					roundClock = nullptr;
 					return;
 				}
 
