@@ -16,9 +16,9 @@ a field, it uncovers itself and some fields around it. Fields that are adjacent 
 number of them written down.
 
 ![Screenshot of main menu.](images/github/main_menu.png)
-![Screenshot of high scores.](https://github.com/thekumor/Minesweeper/tree/main/images/github/high_scores.png)
-![Screenshot of bombs.](https://github.com/thekumor/Minesweeper/tree/main/images/github/bombs.png)
-![Screenshot of gameplay.](https://github.com/thekumor/Minesweeper/tree/main/images/github/hard.png)
+![Screenshot of high scores.](images/github/high_scores.png)
+![Screenshot of bombs.](images/github/bombs.png)
+![Screenshot of gameplay.](images/github/hard.png)
 
 ## Features and Functionalities
 Game contains timers, callbacks and a simple database for high scores.
