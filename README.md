@@ -17,8 +17,8 @@ number of them written down.
 
 ![Screenshot of main menu.](images/github/main_menu.png)
 ![Screenshot of high scores.](images/github/high_scores.png)
-![Screenshot of bombs.](images/github/bombs.png)
-![Screenshot of gameplay.](images/github/hard.png)
+![Screenshot of bombs.](images/github/Bombs.png)
+![Screenshot of gameplay.](images/github/Hard.png)
 
 ## Features and Functionalities
 Game contains timers, callbacks and a simple database for high scores.
