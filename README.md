@@ -15,10 +15,10 @@ player lose the game, flagging all bombs makes player win the game. When player 
 a field, it uncovers itself and some fields around it. Fields that are adjacent to bombs have
 number of them written down.
 
-![Screenshot of main menu.]("https://github.com/thekumor/Minesweeper/tree/main/images/github/Main menu.png")
-![Screenshot of high scores.]("https://github.com/thekumor/Minesweeper/tree/main/images/github/High scores.png")
-![Screenshot of bombs.](https://github.com/thekumor/Minesweeper/tree/main/images/github/Bombs.png)
-![Screenshot of gameplay.](https://github.com/thekumor/Minesweeper/tree/main/images/github/Hard.png)
+![Screenshot of main menu.](https://github.com/thekumor/Minesweeper/tree/main/images/github/main_menu.png)
+![Screenshot of high scores.](https://github.com/thekumor/Minesweeper/tree/main/images/github/high_scores.png)
+![Screenshot of bombs.](https://github.com/thekumor/Minesweeper/tree/main/images/github/bombs.png)
+![Screenshot of gameplay.](https://github.com/thekumor/Minesweeper/tree/main/images/github/hard.png)
 
 ## Features and Functionalities
 Game contains timers, callbacks and a simple database for high scores.
