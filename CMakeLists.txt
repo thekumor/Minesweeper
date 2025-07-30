@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_STANDARD_LIBRARIES "")
 
 file(GLOB minesweeperSrc
-	"src/Minesweeper/*.h"
-	"src/Minesweeper/*.cpp"
+	"build/src/Minesweeper/*.h"
+	"build/src/Minesweeper/*.cpp"
 )
 
 add_executable(${CMAKE_PROJECT_NAME} WIN32 ${minesweeperSrc})
